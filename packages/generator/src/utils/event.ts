@@ -23,7 +23,7 @@ const generateEventKey = ({
     case 'one':
       return `/${modelName.toLowerCase()}/:${indexField?.name}.http.get`
     case 'create':
-      return `/${modelName.toLowerCase()}/:${indexField?.name}.http.post`
+      return `/${modelName.toLowerCase()}.http.post`
     case 'update':
       return `/${modelName.toLowerCase()}/:${indexField?.name}.http.put`
     case 'delete':
@@ -85,7 +85,7 @@ const generateParams = (
             in: 'path',
             required: field.isRequired,
             schema: {
-              type: field.type.toLowerCase(),
+              type: field.type === 'Int' ? 'integer' : field.type.toLowerCase(),
             },
           })),
       }
@@ -143,7 +143,10 @@ const generateBody = (method: METHOD, modelFields: DMMF.Field[]) => {
                     .filter((field) => !field.isId)
                     .reduce((accumulator: any, field) => {
                       accumulator[field.name] = {
-                        type: field.type,
+                        type:
+                          field.kind === 'object'
+                            ? 'object'
+                            : field.type.toLowerCase(),
                       }
 
                       return accumulator
@@ -164,7 +167,7 @@ const generateFn = (
   modelName: String,
   dataSourceName: String,
 ): String => {
-  return `com.biz.${dataSourceName.toLowerCase()}_${modelName.toLowerCase()}_${method}`
+  return `com.biz.${dataSourceName.toLowerCase()}.${modelName.toLowerCase()}.${method}`
 }
 
 export const generateAndStoreEvent = async (

@@ -1,7 +1,7 @@
 {
   "name": "godspeed-crud-api-generator",
   "description": "THis will read the datastore schema, and will generate CRUD events and workflows",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "dist/generator.js",
   "license": "MIT",
   "bin": {

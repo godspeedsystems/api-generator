@@ -1,0 +1,10 @@
+/comment/:id.http.get:
+  summary: Fetch Comment
+  description: Fetch Comment from database
+  fn: com.biz.schema.comment.one
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string

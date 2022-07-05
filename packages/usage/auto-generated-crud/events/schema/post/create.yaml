@@ -1,7 +1,7 @@
-/post/:id.http.post:
+/post.http.post:
   summary: Create a new Post
   description: Create Post from database
-  fn: com.biz.schema_post_create
+  fn: com.biz.schema.post.create
   body:
     content:
       applicaion/json:
@@ -10,12 +10,12 @@
           properties:
             data:
               createdAt:
-                type: DateTime
+                type: datetime
               title:
-                type: String
+                type: string
               published:
-                type: Boolean
+                type: boolean
               author:
-                type: User
+                type: object
               authorId:
-                type: Int
+                type: int

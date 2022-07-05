@@ -1,13 +1,13 @@
-/category/:id.http.put:
-  summary: Update a Category
-  description: Update Category from database
-  fn: com.biz.schema.category.update
+/comment/:id.http.put:
+  summary: Update a Comment
+  description: Update Comment from database
+  fn: com.biz.schema.comment.update
   params:
     - name: id
       in: path
       required: true
       schema:
-        type: integer
+        type: string
   body:
     content:
       applicaion/json:
@@ -15,5 +15,5 @@
           type: object
           properties:
             data:
-              name:
+              text:
                 type: string

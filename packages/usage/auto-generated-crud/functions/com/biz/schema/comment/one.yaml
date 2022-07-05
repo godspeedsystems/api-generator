@@ -1,0 +1,11 @@
+summary: Fetch Comment
+tasks:
+  - id: schema_comment_one
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data:
+        where:
+          id: <% inputs.params.id %>
+      config:
+        method: comment.findUnique

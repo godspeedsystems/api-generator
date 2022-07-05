@@ -1,10 +1,10 @@
 /profile/:id.http.get:
   summary: Fetch Profile
   description: Fetch Profile from database
-  fn: com.biz.schema_profile_one
+  fn: com.biz.schema.profile.one
   params:
     - name: id
       in: path
       required: true
       schema:
-        type: string
+        type: integer

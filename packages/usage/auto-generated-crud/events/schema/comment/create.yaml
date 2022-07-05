@@ -1,0 +1,13 @@
+/comment.http.post:
+  summary: Create a new Comment
+  description: Create Comment from database
+  fn: com.biz.schema.comment.create
+  body:
+    content:
+      applicaion/json:
+        schema:
+          type: object
+          properties:
+            data:
+              text:
+                type: string

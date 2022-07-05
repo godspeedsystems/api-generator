@@ -1,5 +1,5 @@
 {
-  "datamodel": "generator custom_generator {\n  provider = \"node ../../node_modules/godspeed-crud-api-generator\"\n  output   = \"../auto-generated-crud\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id      Int      @id @default(autoincrement())\n  email   String   @unique\n  name    String?\n  role    Role     @default(USER)\n  posts   Post[]\n  profile Profile?\n}\n\nmodel Profile {\n  id     Int    @id @default(autoincrement())\n  bio    String\n  user   User   @relation(fields: [userId], references: [id])\n  userId Int    @unique\n}\n\nmodel Post {\n  id         Int        @id @default(autoincrement())\n  createdAt  DateTime   @default(now())\n  title      String\n  published  Boolean    @default(false)\n  author     User       @relation(fields: [authorId], references: [id])\n  authorId   Int\n}\n\nmodel Category {\n  id    Int    @id @default(autoincrement())\n  name  String\n}\n\nenum Role {\n  USER\n  ADMIN\n}",
+  "datamodel": "datasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\ngenerator godspeed {\n  provider = \"node ../../node_modules/godspeed-crud-api-generator\"\n  output   = \"../auto-generated-crud\"\n}\n\n\nmodel User {\n  id      Int      @id @default(autoincrement())\n  email   String   @unique\n  name    String?\n  role    Role     @default(USER)\n  posts   Post[]\n  profile Profile?\n}\n\nmodel Profile {\n  id     Int    @id @default(autoincrement())\n  bio    String\n  user   User   @relation(fields: [userId], references: [id])\n  userId Int    @unique\n}\n\nmodel Post {\n  id         Int        @id @default(autoincrement())\n  createdAt  DateTime   @default(now())\n  title      String\n  published  Boolean    @default(false)\n  author     User       @relation(fields: [authorId], references: [id])\n  authorId   Int\n}\n\nmodel Category {\n  id    Int    @id @default(autoincrement())\n  name  String\n}\n\nmodel Comment {\n  id    String  @id\n  text  String\n}\n\nenum Role {\n  USER\n  ADMIN\n}",
   "datasources": [
     {
       "name": "db",
@@ -12,7 +12,7 @@
     }
   ],
   "generator": {
-    "name": "custom_generator",
+    "name": "godspeed",
     "provider": {
       "fromEnvVar": null,
       "value": "node ../../node_modules/godspeed-crud-api-generator"
@@ -344,6 +344,42 @@
             },
             {
               "name": "name",
+              "kind": "scalar",
+              "isList": false,
+              "isRequired": true,
+              "isUnique": false,
+              "isId": false,
+              "isReadOnly": false,
+              "type": "String",
+              "hasDefaultValue": false,
+              "isGenerated": false,
+              "isUpdatedAt": false
+            }
+          ],
+          "isGenerated": false,
+          "primaryKey": null,
+          "uniqueFields": [],
+          "uniqueIndexes": []
+        },
+        {
+          "name": "Comment",
+          "dbName": null,
+          "fields": [
+            {
+              "name": "id",
+              "kind": "scalar",
+              "isList": false,
+              "isRequired": true,
+              "isUnique": false,
+              "isId": true,
+              "isReadOnly": false,
+              "type": "String",
+              "hasDefaultValue": false,
+              "isGenerated": false,
+              "isUpdatedAt": false
+            },
+            {
+              "name": "text",
               "kind": "scalar",
               "isList": false,
               "isRequired": true,
@@ -2294,6 +2330,328 @@
             ]
           },
           {
+            "name": "CommentWhereInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "AND",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentWhereInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "CommentWhereInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": true
+                  }
+                ]
+              },
+              {
+                "name": "OR",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentWhereInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": true
+                  }
+                ]
+              },
+              {
+                "name": "NOT",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentWhereInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "CommentWhereInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": true
+                  }
+                ]
+              },
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "StringFilter",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "StringFilter",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentOrderByWithRelationInput",
+            "constraints": {
+              "maxNumFields": 1,
+              "minNumFields": 0
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentWhereUniqueInput",
+            "constraints": {
+              "maxNumFields": 1,
+              "minNumFields": 1
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentOrderByWithAggregationInput",
+            "constraints": {
+              "maxNumFields": 1,
+              "minNumFields": 0
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "_count",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentCountOrderByAggregateInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "_max",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentMaxOrderByAggregateInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "_min",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentMinOrderByAggregateInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentScalarWhereWithAggregatesInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "AND",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentScalarWhereWithAggregatesInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "CommentScalarWhereWithAggregatesInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": true
+                  }
+                ]
+              },
+              {
+                "name": "OR",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentScalarWhereWithAggregatesInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": true
+                  }
+                ]
+              },
+              {
+                "name": "NOT",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "CommentScalarWhereWithAggregatesInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "CommentScalarWhereWithAggregatesInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": true
+                  }
+                ]
+              },
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "StringWithAggregatesFilter",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "StringWithAggregatesFilter",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  },
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
             "name": "UserCreateInput",
             "constraints": {
               "maxNumFields": null,
@@ -3949,6 +4307,285 @@
               },
               {
                 "name": "name",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentCreateInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": true,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": true,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentUncheckedCreateInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": true,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": true,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentUpdateInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentUncheckedUpdateInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentCreateManyInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": true,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": true,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentUpdateManyMutationInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentUncheckedUpdateManyInput",
+            "constraints": {
+              "maxNumFields": null,
+              "minNumFields": null
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "String",
+                    "location": "scalar",
+                    "isList": false
+                  },
+                  {
+                    "type": "StringFieldUpdateOperationsInput",
+                    "namespace": "prisma",
+                    "location": "inputObjectTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
                 "isRequired": false,
                 "isNullable": false,
                 "inputTypes": [
@@ -6582,6 +7219,111 @@
             "fields": [
               {
                 "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentCountOrderByAggregateInput",
+            "constraints": {
+              "maxNumFields": 1,
+              "minNumFields": 1
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentMaxOrderByAggregateInput",
+            "constraints": {
+              "maxNumFields": 1,
+              "minNumFields": 1
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "CommentMinOrderByAggregateInput",
+            "constraints": {
+              "maxNumFields": 1,
+              "minNumFields": 1
+            },
+            "fields": [
+              {
+                "name": "id",
+                "isRequired": false,
+                "isNullable": false,
+                "inputTypes": [
+                  {
+                    "type": "SortOrder",
+                    "namespace": "prisma",
+                    "location": "enumTypes",
+                    "isList": false
+                  }
+                ]
+              },
+              {
+                "name": "text",
                 "isRequired": false,
                 "isNullable": false,
                 "inputTypes": [
@@ -13166,6 +13908,400 @@
                   "location": "outputObjectTypes",
                   "isList": false
                 }
+              },
+              {
+                "name": "findFirstComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "orderBy",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentOrderByWithRelationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": true
+                      },
+                      {
+                        "type": "CommentOrderByWithRelationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "cursor",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "take",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "skip",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "distinct",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentScalarFieldEnum",
+                        "namespace": "prisma",
+                        "location": "enumTypes",
+                        "isList": true
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": true,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "findManyComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "orderBy",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentOrderByWithRelationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": true
+                      },
+                      {
+                        "type": "CommentOrderByWithRelationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "cursor",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "take",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "skip",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "distinct",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentScalarFieldEnum",
+                        "namespace": "prisma",
+                        "location": "enumTypes",
+                        "isList": true
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": true
+                }
+              },
+              {
+                "name": "aggregateComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "orderBy",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentOrderByWithRelationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": true
+                      },
+                      {
+                        "type": "CommentOrderByWithRelationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "cursor",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "take",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "skip",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "AggregateComment",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "groupByComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "orderBy",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentOrderByWithAggregationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": true
+                      },
+                      {
+                        "type": "CommentOrderByWithAggregationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "by",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentScalarFieldEnum",
+                        "namespace": "prisma",
+                        "location": "enumTypes",
+                        "isList": true
+                      },
+                      {
+                        "type": "CommentScalarFieldEnum",
+                        "namespace": "prisma",
+                        "location": "enumTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "having",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentScalarWhereWithAggregatesInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "take",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "skip",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Int",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "CommentGroupByOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": true
+                }
+              },
+              {
+                "name": "findUniqueComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": true,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
               }
             ]
           },
@@ -14249,6 +15385,275 @@
                 }
               },
               {
+                "name": "createOneComment",
+                "args": [
+                  {
+                    "name": "data",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentCreateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      },
+                      {
+                        "type": "CommentUncheckedCreateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "upsertOneComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "create",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentCreateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      },
+                      {
+                        "type": "CommentUncheckedCreateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "update",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentUpdateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      },
+                      {
+                        "type": "CommentUncheckedUpdateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "createManyComment",
+                "args": [
+                  {
+                    "name": "data",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentCreateManyInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": true
+                      }
+                    ]
+                  },
+                  {
+                    "name": "skipDuplicates",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "Boolean",
+                        "location": "scalar",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "AffectedRowsOutput",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "deleteOneComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": true,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "updateOneComment",
+                "args": [
+                  {
+                    "name": "data",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentUpdateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      },
+                      {
+                        "type": "CommentUncheckedUpdateInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "where",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereUniqueInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": true,
+                "outputType": {
+                  "type": "Comment",
+                  "namespace": "model",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "updateManyComment",
+                "args": [
+                  {
+                    "name": "data",
+                    "isRequired": true,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentUpdateManyMutationInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      },
+                      {
+                        "type": "CommentUncheckedUpdateManyInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  },
+                  {
+                    "name": "where",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "AffectedRowsOutput",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "deleteManyComment",
+                "args": [
+                  {
+                    "name": "where",
+                    "isRequired": false,
+                    "isNullable": false,
+                    "inputTypes": [
+                      {
+                        "type": "CommentWhereInput",
+                        "namespace": "prisma",
+                        "location": "inputObjectTypes",
+                        "isList": false
+                      }
+                    ]
+                  }
+                ],
+                "isNullable": false,
+                "outputType": {
+                  "type": "AffectedRowsOutput",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
                 "name": "executeRaw",
                 "args": [
                   {
@@ -14934,6 +16339,102 @@
                 "isNullable": true,
                 "outputType": {
                   "type": "CategoryMaxAggregateOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              }
+            ]
+          },
+          {
+            "name": "AggregateComment",
+            "fields": [
+              {
+                "name": "_count",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "CommentCountAggregateOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "_min",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "CommentMinAggregateOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "_max",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "CommentMaxAggregateOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              }
+            ]
+          },
+          {
+            "name": "CommentGroupByOutputType",
+            "fields": [
+              {
+                "name": "id",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "text",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "_count",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "CommentCountAggregateOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "_min",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "CommentMinAggregateOutputType",
+                  "namespace": "prisma",
+                  "location": "outputObjectTypes",
+                  "isList": false
+                }
+              },
+              {
+                "name": "_max",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "CommentMaxAggregateOutputType",
                   "namespace": "prisma",
                   "location": "outputObjectTypes",
                   "isList": false
@@ -15652,6 +17153,91 @@
                 }
               }
             ]
+          },
+          {
+            "name": "CommentCountAggregateOutputType",
+            "fields": [
+              {
+                "name": "id",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "Int",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "text",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "Int",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "_all",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "Int",
+                  "location": "scalar",
+                  "isList": false
+                }
+              }
+            ]
+          },
+          {
+            "name": "CommentMinAggregateOutputType",
+            "fields": [
+              {
+                "name": "id",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "text",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              }
+            ]
+          },
+          {
+            "name": "CommentMaxAggregateOutputType",
+            "fields": [
+              {
+                "name": "id",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "text",
+                "args": [],
+                "isNullable": true,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              }
+            ]
           }
         ],
         "model": [
@@ -15953,6 +17539,31 @@
                 }
               }
             ]
+          },
+          {
+            "name": "Comment",
+            "fields": [
+              {
+                "name": "id",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              },
+              {
+                "name": "text",
+                "args": [],
+                "isNullable": false,
+                "outputType": {
+                  "type": "String",
+                  "location": "scalar",
+                  "isList": false
+                }
+              }
+            ]
           }
         ]
       },
@@ -15990,6 +17601,13 @@
             "values": [
               "id",
               "name"
+            ]
+          },
+          {
+            "name": "CommentScalarFieldEnum",
+            "values": [
+              "id",
+              "text"
             ]
           },
           {
@@ -16079,6 +17697,21 @@
           "updateMany": "updateManyCategory",
           "updateOne": "updateOneCategory",
           "upsertOne": "upsertOneCategory"
+        },
+        {
+          "model": "Comment",
+          "aggregate": "aggregateComment",
+          "createMany": "createManyComment",
+          "createOne": "createOneComment",
+          "deleteMany": "deleteManyComment",
+          "deleteOne": "deleteOneComment",
+          "findFirst": "findFirstComment",
+          "findMany": "findManyComment",
+          "findUnique": "findUniqueComment",
+          "groupBy": "groupByComment",
+          "updateMany": "updateManyComment",
+          "updateOne": "updateOneComment",
+          "upsertOne": "upsertOneComment"
         }
       ],
       "otherOperations": {

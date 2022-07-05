@@ -1,12 +1,13 @@
-generator custom_generator {
-  provider = "node ../../node_modules/godspeed-crud-api-generator"
-  output   = "../auto-generated-crud"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+generator godspeed {
+  provider = "node ../../node_modules/godspeed-crud-api-generator"
+  output   = "../auto-generated-crud"
+}
+
 
 model User {
   id      Int      @id @default(autoincrement())
@@ -36,6 +37,11 @@ model Post {
 model Category {
   id    Int    @id @default(autoincrement())
   name  String
+}
+
+model Comment {
+  id    String  @id
+  text  String
 }
 
 enum Role {

@@ -1,0 +1,10 @@
+/comment/:id.http.delete:
+  summary: Delete a Comment
+  description: Delete Comment from database
+  fn: com.biz.schema.comment.delete
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string

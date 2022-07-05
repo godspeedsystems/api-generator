@@ -9,13 +9,19 @@
           type: object
           properties:
             data:
-              createdAt:
-                type: datetime
-              title:
-                type: string
-              published:
-                type: boolean
-              author:
-                type: object
-              authorId:
-                type: int
+              type: object
+              properties:
+                createdAt:
+                  type: string
+                title:
+                  type: string
+                published:
+                  type: boolean
+                authorId:
+                  type: integer
+                slug:
+                  type: string
+                body:
+                  type: string
+                description:
+                  type: string

@@ -7,7 +7,7 @@
       in: path
       required: true
       schema:
-        type: string
+        type: integer
   body:
     content:
       applicaion/json:
@@ -15,5 +15,7 @@
           type: object
           properties:
             data:
-              text:
-                type: string
+              type: object
+              properties:
+                text:
+                  type: string

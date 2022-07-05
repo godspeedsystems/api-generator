@@ -6,6 +6,6 @@ tasks:
       datasource: schema
       data:
         where:
-          id: <% inputs.params.id %>
+          id: <% std.parseInt(inputs.params.id) %>
       config:
         method: comment.delete

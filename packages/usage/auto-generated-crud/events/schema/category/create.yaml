@@ -9,5 +9,7 @@
           type: object
           properties:
             data:
-              name:
-                type: string
+              type: object
+              properties:
+                name:
+                  type: string

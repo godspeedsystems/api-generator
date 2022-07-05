@@ -9,13 +9,9 @@
           type: object
           properties:
             data:
-              email:
-                type: string
-              name:
-                type: string
-              role:
-                type: role
-              posts:
-                type: object
-              profile:
-                type: object
+              type: object
+              properties:
+                email:
+                  type: string
+                name:
+                  type: string

@@ -6,7 +6,7 @@ tasks:
       datasource: schema
       data:
         where:
-          id: <% inputs.params.id %>
+          id: <% std.parseInt(inputs.params.id) %>
         data: <% inputs.body.data %>
       config:
         method: Comment.update

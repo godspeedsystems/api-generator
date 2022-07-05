@@ -15,9 +15,9 @@
           type: object
           properties:
             data:
-              bio:
-                type: string
-              user:
-                type: object
-              userId:
-                type: int
+              type: object
+              properties:
+                bio:
+                  type: string
+                userId:
+                  type: integer

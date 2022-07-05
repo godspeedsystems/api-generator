@@ -85,7 +85,7 @@ const generateParams = (
             in: 'path',
             required: field.isRequired,
             schema: {
-              type: 'string',
+              type: field.type.toLowerCase(),
             },
           })),
       }
@@ -117,7 +117,10 @@ const generateBody = (method: METHOD, modelFields: DMMF.Field[]) => {
                     .filter((field) => !field.isId)
                     .reduce((accumulator: any, field) => {
                       accumulator[field.name] = {
-                        type: field.type,
+                        type:
+                          field.kind === 'object'
+                            ? 'object'
+                            : field.type.toLowerCase(),
                       }
 
                       return accumulator

@@ -36,16 +36,17 @@
     "ts-jest": "27.1.4",
     "typescript": "4.6.2"
   },
-  "homepage": "Link to homepage or github readme here",
+  "homepage": "https://github.com/ashu17706/godspeed-crud-api-generator#readme",
   "repository": {
     "type": "git",
-    "url": "Repo link here"
+    "url": "https://github.com/ashu17706/godspeed-crud-api-generator"
   },
-  "author": "Your Name <Your Email>",
+  "author": "Ashutosh Tripathi <ashu17706@gmail.com>",
   "keywords": [
     "prisma",
     "prisma2",
-    "generator"
+    "generator",
+    "godspeed"
   ],
   "release": {
     "branches": [

@@ -1,0 +1,12 @@
+# 1.0.0 (2022-07-05)
+
+
+### Bug Fixes
+
+* added logger info ([035c6c4](https://github.com/ashu17706/godspeed-crud-api-generator/commit/035c6c420be8080f5407dafe6f13ce221e6af4a7))
+* package basic info ([e104c0a](https://github.com/ashu17706/godspeed-crud-api-generator/commit/e104c0a043ecd2343aedd54b1d1c2de60baac6c0))
+
+
+### Features
+
+* added husky for safety commit-msg ([2123a81](https://github.com/ashu17706/godspeed-crud-api-generator/commit/2123a8178eaa7c2b68facf7dd7b81171ffdf2186))

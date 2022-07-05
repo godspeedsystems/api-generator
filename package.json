@@ -10,5 +10,8 @@
   },
   "scripts": {
     "prepare": "husky install"
+  },
+  "dependencies": {
+    "godspeed-crud-api-generator": "file:packages/generator"
   }
 }

@@ -113,18 +113,25 @@ const generateBody = (method: METHOD, modelFields: DMMF.Field[]) => {
               schema: {
                 type: 'object',
                 properties: {
-                  data: modelFields
-                    .filter((field) => !field.isId)
-                    .reduce((accumulator: any, field) => {
-                      accumulator[field.name] = {
-                        type:
-                          field.kind === 'object'
-                            ? 'object'
-                            : field.type.toLowerCase(),
-                      }
+                  data: {
+                    type: 'object',
+                    properties: modelFields
+                      .filter((field) => !field.isId)
+                      .reduce((accumulator: any, field) => {
+                        accumulator[field.name] = {
+                          type:
+                            field.kind === 'object'
+                              ? 'object'
+                              : field.type === 'Int'
+                              ? 'integer'
+                              : field.type === 'DateTime'
+                              ? 'string'
+                              : field.type.toLowerCase(),
+                        }
 
-                      return accumulator
-                    }, {}),
+                        return accumulator
+                      }, {}),
+                  },
                 },
               },
             },
@@ -139,18 +146,25 @@ const generateBody = (method: METHOD, modelFields: DMMF.Field[]) => {
               schema: {
                 type: 'object',
                 properties: {
-                  data: modelFields
-                    .filter((field) => !field.isId)
-                    .reduce((accumulator: any, field) => {
-                      accumulator[field.name] = {
-                        type:
-                          field.kind === 'object'
-                            ? 'object'
-                            : field.type.toLowerCase(),
-                      }
+                  data: {
+                    type: 'object',
+                    properties: modelFields
+                      .filter((field) => !field.isId)
+                      .reduce((accumulator: any, field) => {
+                        accumulator[field.name] = {
+                          type:
+                            field.kind === 'object'
+                              ? 'object'
+                              : field.type === 'Int'
+                              ? 'integer'
+                              : field.type === 'DateTime'
+                              ? 'string'
+                              : field.type.toLowerCase(),
+                        }
 
-                      return accumulator
-                    }, {}),
+                        return accumulator
+                      }, {}),
+                  },
                 },
               },
             },

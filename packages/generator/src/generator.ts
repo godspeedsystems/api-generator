@@ -58,5 +58,6 @@ generatorHandler({
         }
       })
     })
+    logger.info('Successfully generated all events and workflows.')
   },
 })

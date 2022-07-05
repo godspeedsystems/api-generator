@@ -1,0 +1,9 @@
+summary: Create Profile
+tasks:
+  - id: schema_profile_create
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data: <% inputs.body %>
+      config:
+        method: profile.create

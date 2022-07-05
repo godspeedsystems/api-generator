@@ -1,0 +1,13 @@
+/category/:id.http.post:
+  summary: Create a new Category
+  description: Create Category from database
+  fn: com.biz.schema_category_create
+  body:
+    content:
+      applicaion/json:
+        schema:
+          type: object
+          properties:
+            data:
+              name:
+                type: String

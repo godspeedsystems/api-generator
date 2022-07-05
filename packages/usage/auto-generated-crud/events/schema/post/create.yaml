@@ -1,0 +1,21 @@
+/post/:id.http.post:
+  summary: Create a new Post
+  description: Create Post from database
+  fn: com.biz.schema_post_create
+  body:
+    content:
+      applicaion/json:
+        schema:
+          type: object
+          properties:
+            data:
+              createdAt:
+                type: DateTime
+              title:
+                type: String
+              published:
+                type: Boolean
+              author:
+                type: User
+              authorId:
+                type: Int

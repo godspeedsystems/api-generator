@@ -1,0 +1,10 @@
+/user/:id.http.delete:
+  summary: Delete a User
+  description: Delete User from database
+  fn: com.biz.schema_user_delete
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string

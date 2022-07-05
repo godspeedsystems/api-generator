@@ -1,0 +1,10 @@
+/profile/:id.http.delete:
+  summary: Delete a Profile
+  description: Delete Profile from database
+  fn: com.biz.schema_profile_delete
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string

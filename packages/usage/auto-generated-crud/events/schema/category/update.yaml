@@ -1,0 +1,19 @@
+/category/:id.http.put:
+  summary: Update a Category
+  description: Update Category from database
+  fn: com.biz.schema_category_update
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  body:
+    content:
+      applicaion/json:
+        schema:
+          type: object
+          properties:
+            data:
+              name:
+                type: String

@@ -1,0 +1,9 @@
+summary: Create User
+tasks:
+  - id: schema_user_create
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data: <% inputs.body %>
+      config:
+        method: user.create

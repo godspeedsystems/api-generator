@@ -1,0 +1,23 @@
+/profile/:id.http.put:
+  summary: Update a Profile
+  description: Update Profile from database
+  fn: com.biz.schema_profile_update
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  body:
+    content:
+      applicaion/json:
+        schema:
+          type: object
+          properties:
+            data:
+              bio:
+                type: String
+              user:
+                type: User
+              userId:
+                type: Int

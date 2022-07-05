@@ -1,0 +1,9 @@
+summary: Create Post
+tasks:
+  - id: schema_post_create
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data: <% inputs.body %>
+      config:
+        method: post.create

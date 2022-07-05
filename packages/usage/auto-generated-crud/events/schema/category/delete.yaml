@@ -1,0 +1,10 @@
+/category/:id.http.delete:
+  summary: Delete a Category
+  description: Delete Category from database
+  fn: com.biz.schema_category_delete
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string

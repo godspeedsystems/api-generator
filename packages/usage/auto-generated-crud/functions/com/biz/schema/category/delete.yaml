@@ -1,0 +1,11 @@
+summary: Delete Category
+tasks:
+  - id: schema_category_delete
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data:
+        where:
+          id: <% std.parseInt(inputs.params.id) %>
+      config:
+        method: category.delete

@@ -1,0 +1,27 @@
+/user/:id.http.put:
+  summary: Update a User
+  description: Update User from database
+  fn: com.biz.schema_user_update
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  body:
+    content:
+      applicaion/json:
+        schema:
+          type: object
+          properties:
+            data:
+              email:
+                type: String
+              name:
+                type: String
+              role:
+                type: Role
+              posts:
+                type: Post
+              profile:
+                type: Profile

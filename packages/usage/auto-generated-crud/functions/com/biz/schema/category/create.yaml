@@ -1,0 +1,9 @@
+summary: Create Category
+tasks:
+  - id: schema_category_create
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data: <% inputs.body %>
+      config:
+        method: category.create

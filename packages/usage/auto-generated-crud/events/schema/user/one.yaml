@@ -1,0 +1,10 @@
+/user/:id.http.get:
+  summary: Fetch User
+  description: Fetch User from database
+  fn: com.biz.schema_user_one
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string

@@ -1,6 +1,6 @@
 generator custom_generator {
   provider = "node ../../node_modules/godspeed-crud-api-generator"
-  output   = "../types"
+  output   = "../auto-generated-crud"
 }
 
 datasource db {
@@ -9,26 +9,36 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String?
+  role    Role     @default(USER)
+  posts   Post[]
+  profile Profile?
 }
 
-enum NotificationType {
-  newPosts
-  newComments
-  newFollowers
-  reply
-  heartOnPost
-  heartOnComment
-  heartOnReply
+model Profile {
+  id     Int    @id @default(autoincrement())
+  bio    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
 }
 
-enum Language {
-  Typescript
-  Javascript
-  Rust
-  Go
-  Python
-  Cpp
+model Post {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  title      String
+  published  Boolean    @default(false)
+  author     User       @relation(fields: [authorId], references: [id])
+  authorId   Int
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+}
+
+enum Role {
+  USER
+  ADMIN
 }

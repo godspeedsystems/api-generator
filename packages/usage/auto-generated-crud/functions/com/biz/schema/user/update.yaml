@@ -1,0 +1,12 @@
+summary: Update User
+tasks:
+  - id: schema_user_update
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data:
+        where:
+          id: <% std.parseInt(inputs.params.id) %>
+        data: <% inputs.body.data %>
+      config:
+        method: User.update

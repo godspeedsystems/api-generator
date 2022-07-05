@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.0.0...v1.0.1) (2022-07-05)
+
+
+### Bug Fixes
+
+* handled string id fields and object data fields ([4c55030](https://github.com/ashu17706/godspeed-crud-api-generator/commit/4c550306e18cb88029558db3009d17e11d4ef90d))
+
 # 1.0.0 (2022-07-05)
 
 

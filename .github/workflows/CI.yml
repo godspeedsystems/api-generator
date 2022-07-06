@@ -8,6 +8,7 @@ on:
       - '*'
 jobs:
   Test:
+<<<<<<< HEAD
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -31,6 +32,30 @@ jobs:
       - name: Run Tests 🧪
         working-directory: ./packages/generator
         run: npm run test
+=======
+      runs-on: ${{ matrix.os }}
+      strategy:
+        matrix:
+          node-version:
+            - 16.x
+          os:
+            - ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Use Node.js ${{matrix.node-version}}
+          uses: actions/setup-node@v2
+          with:
+            node-version: ${{ matrix.node-version }}
+        - uses: actions/cache@v2
+          with:
+            path: "**/node_modules"
+            key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+        - name: Install dependencies
+          run: npm ci
+        - name: Run Tests 🧪
+          working-directory: ./packages/generator
+          run: npm run test
+>>>>>>> afecfe809240901a00a8d5b876afb34a9bdb57a8
   Publish:
     runs-on: ubuntu-latest
     needs:

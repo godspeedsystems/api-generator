@@ -1,3 +1,15 @@
+## [1.0.3](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.0.2...v1.0.3) (2022-07-06)
+
+
+### Bug Fixes
+
+* data structure in create update ([60917dc](https://github.com/ashu17706/godspeed-crud-api-generator/commit/60917dc1511ec40db3f04b25927f2e5257b6e6fd))
+* fixed CI ([7541aaf](https://github.com/ashu17706/godspeed-crud-api-generator/commit/7541aafe0b4dca22c8324e72f9499b390a86136b))
+* fixes build process ([85c4d3c](https://github.com/ashu17706/godspeed-crud-api-generator/commit/85c4d3ca16ce41c123703f9a955fd3be9d819f83))
+* fixes CI file ([42093a6](https://github.com/ashu17706/godspeed-crud-api-generator/commit/42093a6209d01209ee96361ed51e4dcaa2d8d8ef))
+* removed test from CI ([9c7d33e](https://github.com/ashu17706/godspeed-crud-api-generator/commit/9c7d33eb5c88a03ca1cfa036cde6d6e57f31f1ae))
+* updated README ([85388b0](https://github.com/ashu17706/godspeed-crud-api-generator/commit/85388b09fc7070787603a297216df5602df4b427))
+
 ## [1.0.2](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.0.1...v1.0.2) (2022-07-05)
 
 

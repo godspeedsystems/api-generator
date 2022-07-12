@@ -1,16 +1,15 @@
 import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper'
-import { logger } from '@prisma/sdk'
-import path from 'path'
+import { logger, parseEnvValue } from '@prisma/sdk'
+
+import { transformDMMF } from 'prisma-json-schema-generator/dist/generator/transformDMMF'
 
 import { generateAndStoreEvent, METHOD } from './utils/event'
 import { generateAndStorWorkflow } from './utils/workflow'
-import { writeFileSafely } from './utils/writeFileSafely'
 
 const { name: generatorName, version } = require('../package.json')
 
 generatorHandler({
   onManifest() {
-    logger.info(`${generatorName}:Registered`)
     return {
       version,
       defaultOutput: '../generated',
@@ -18,46 +17,52 @@ generatorHandler({
     }
   },
   onGenerate: async (options: GeneratorOptions) => {
-    // lets investigate options
-    await writeFileSafely(
-      path.join(options.generator.output?.value!, 'options.json'),
-      JSON.stringify(options, null, 2),
-    )
+    if (options.generator.output) {
+      const jsonSchema = transformDMMF(options.dmmf, options.generator.config)
 
-    let basePathForGeneration = options.generator.output?.value
+      // console.log(JSON.stringify(jsonSchema, null, 2))
 
-    let dsName =
-      options.datasources[0]?.name === 'db'
-        ? options.schemaPath
-            .slice(options.schemaPath.lastIndexOf('/') + 1)
-            .replace('.prisma', '')
-        : ''
+      try {
+        let basePathForGeneration = parseEnvValue(options.generator.output)
+        let dataSourceName =
+          options.datasources[0]?.name === 'db'
+            ? options.schemaPath
+                .slice(options.schemaPath.lastIndexOf('/') + 1)
+                .replace('.prisma', '')
+            : ''
 
-    options.dmmf.datamodel.models.forEach(async (modelInfo) => {
-      const METHODS: METHOD[] = ['one', 'create', 'update', 'delete']
+        options.dmmf.datamodel.models.forEach(async (modelInfo) => {
+          const METHODS: METHOD[] = ['one', 'create', 'update', 'delete']
 
-      METHODS.map((method) => {
-        if (typeof basePathForGeneration !== 'undefined') {
-          // events generation for each method
-          generateAndStoreEvent({
-            basePathForGeneration,
-            modelName: modelInfo.name,
-            dataSourceName: dsName,
-            modelFields: modelInfo.fields,
-            method,
+          METHODS.map((method) => {
+            if (typeof basePathForGeneration !== 'undefined') {
+              // events generation for each method
+              generateAndStoreEvent({
+                basePathForGeneration,
+                modelName: modelInfo.name,
+                dataSourceName,
+                modelFields: modelInfo.fields,
+                method,
+                jsonSchema,
+              })
+
+              // workflows generation for each corresponding crud
+              generateAndStorWorkflow({
+                basePathForGeneration,
+                modelName: modelInfo.name,
+                dataSourceName,
+                modelFields: modelInfo.fields,
+                method,
+              })
+            }
           })
-
-          // workflows generation for each corresponding crud
-          generateAndStorWorkflow({
-            basePathForGeneration,
-            modelName: modelInfo.name,
-            dataSourceName: dsName,
-            modelFields: modelInfo.fields,
-            method,
-          })
-        }
-      })
-    })
-    logger.info('Successfully generated all events and workflows.')
+        })
+      } catch (error) {
+        logger.error('Error: unable to write files for ' + `${generatorName}`)
+        throw error
+      }
+    } else {
+      throw new Error('No output was specified for ' + `${generatorName}`)
+    }
   },
 })

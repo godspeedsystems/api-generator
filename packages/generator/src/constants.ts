@@ -1,1 +1,1 @@
-export const GENERATOR_NAME = 'godspeed-crud-api-generator'
+export const GENERATOR_NAME = 'Godspeed CRUD api generator'

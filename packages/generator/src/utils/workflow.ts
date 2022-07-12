@@ -84,6 +84,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
           },
         },
       }
+    // <js% Integer.parseInt(`inputs.params.${indexField?.name})`) %>
     case 'update':
       return {
         data: {

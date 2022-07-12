@@ -1,9 +1,0 @@
-summary: Create Comment
-tasks:
-  - id: schema_comment_create
-    fn: com.gs.datastore
-    args:
-      datasource: schema
-      data: <% inputs.body %>
-      config:
-        method: comment.create

@@ -1,6 +1,8 @@
 import { DMMF } from '@prisma/generator-helper'
 import { generateWriteLocationForMethod } from './generateWriteLocationForMethod'
 import { writeFileSafely } from './writeFileSafely'
+import { JSONSchema7 } from 'json-schema'
+import assert from 'assert'
 
 const jsYaml = require('js-yaml')
 
@@ -17,7 +19,9 @@ const generateEventKey = ({
   modelFields,
   method,
 }: EventConfig): string => {
-  let indexField = modelFields.find((field) => field.isId)
+  let indexField = modelFields.find(
+    ({ isId }: { isId: DMMF.Field['isId'] }) => isId,
+  )
 
   switch (method) {
     case 'one':
@@ -69,110 +73,72 @@ const generateDescriptionBasedOnModelAndMethod = (
   }
 }
 
-const generateParams = (
-  method: METHOD,
-  modelFields: Array<DMMF.Field>,
-): any => {
-  switch (method) {
-    case 'one':
-    case 'update':
-    case 'delete': {
-      return {
-        params: modelFields
-          .filter((field) => field.isId)
-          .map((field) => ({
-            name: field.name,
-            in: 'path',
-            required: field.isRequired,
-            schema: {
-              type: field.type === 'Int' ? 'integer' : field.type.toLowerCase(),
-            },
-          })),
-      }
-    }
-
-    case 'create':
-      return {}
-
-    default:
-      return {}
-  }
+type Param = {
+  name: string
+  // TODO: handle other in props
+  in: 'path'
+  required: true
+  schema: { type: 'string' | 'integer' }
 }
 
-const generateBody = (method: METHOD, modelFields: DMMF.Field[]) => {
-  switch (method) {
-    case 'one':
-    case 'delete': {
-      return {}
+type Body = {
+  content: { 'application/json': { schema: JSONSchema7 } }
+}
+
+type BodyAndParams = {
+  body?: Body
+  params: Param[]
+}
+
+const generateBodyAndParamsFromJsonSchema = (
+  method: METHOD,
+  modelName: string,
+  jsonSchema: JSONSchema7,
+): BodyAndParams => {
+  let definitions = jsonSchema['definitions']
+  if (definitions) {
+    let modelDefinition = definitions[modelName]
+
+    assert(modelDefinition, `Definition undefined for ${modelName}`)
+    assert(
+      typeof modelDefinition !== 'boolean',
+      `Definition of type boolean unsupported`,
+    )
+
+    let { id, ...rest } = modelDefinition.properties ?? {}
+
+    assert(typeof id !== 'undefined', 'Definition must have property `id`')
+    assert(typeof id !== 'boolean', `id of type boolean unsupported`)
+    assert(
+      id.type === 'string' || id.type === 'integer',
+      `id must be of type string or integer but got ${id.type}`,
+    )
+
+    return {
+      body:
+        method === 'create' || method === 'update'
+          ? {
+              content: {
+                'application/json': {
+                  schema: {
+                    ...modelDefinition,
+                    properties: {
+                      ...rest,
+                    },
+                  },
+                },
+              },
+            }
+          : undefined,
+      params: [
+        { name: 'id', in: 'path', required: true, schema: { type: id.type } },
+      ],
     }
-    case 'create':
-      return {
-        body: {
-          content: {
-            'applicaion/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  data: {
-                    type: 'object',
-                    properties: modelFields
-                      .filter((field) => !field.isId)
-                      .reduce((accumulator: any, field) => {
-                        accumulator[field.name] = {
-                          type:
-                            field.kind === 'object'
-                              ? 'object'
-                              : field.type === 'Int'
-                              ? 'integer'
-                              : field.type === 'DateTime'
-                              ? 'string'
-                              : field.type.toLowerCase(),
-                        }
-
-                        return accumulator
-                      }, {}),
-                  },
-                },
-              },
-            },
-          },
-        },
-      }
-    case 'update':
-      return {
-        body: {
-          content: {
-            'applicaion/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  data: {
-                    type: 'object',
-                    properties: modelFields
-                      .filter((field) => !field.isId)
-                      .reduce((accumulator: any, field) => {
-                        accumulator[field.name] = {
-                          type:
-                            field.kind === 'object'
-                              ? 'object'
-                              : field.type === 'Int'
-                              ? 'integer'
-                              : field.type === 'DateTime'
-                              ? 'string'
-                              : field.type.toLowerCase(),
-                        }
-
-                        return accumulator
-                      }, {}),
-                  },
-                },
-              },
-            },
-          },
-        },
-      }
-    default:
-      return {}
+  } else {
+    return {
+      body: undefined,
+      params: [],
+    }
   }
 }
 
@@ -185,7 +151,10 @@ const generateFn = (
 }
 
 export const generateAndStoreEvent = async (
-  eventConfig: EventConfig & { basePathForGeneration: string },
+  eventConfig: EventConfig & {
+    basePathForGeneration: string
+    jsonSchema: JSONSchema7
+  },
 ): Promise<string> => {
   let json: any = {}
 
@@ -195,6 +164,7 @@ export const generateAndStoreEvent = async (
     modelName,
     method,
     modelFields,
+    jsonSchema,
   } = eventConfig
 
   let eventKey = generateEventKey({
@@ -206,16 +176,27 @@ export const generateAndStoreEvent = async (
 
   let summary = generateSummaryBasedOnModelAndMethod(modelName, method)
   let description = generateDescriptionBasedOnModelAndMethod(modelName, method)
-  let params = generateParams(method, modelFields)
   let fn = generateFn(method, modelName, dataSourceName)
-  let body = generateBody(method, modelFields)
+
+  let bodyAndParams: BodyAndParams = { params: [] }
+
+  try {
+    let { body, params } = generateBodyAndParamsFromJsonSchema(
+      method,
+      modelName,
+      jsonSchema,
+    )
+
+    bodyAndParams = { body, params }
+  } catch (error) {
+    console.warn(error)
+  }
 
   json[eventKey] = {
     summary,
     description,
     fn,
-    ...params,
-    ...body,
+    ...bodyAndParams,
   }
 
   const writeLocation = generateWriteLocationForMethod(

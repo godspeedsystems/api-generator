@@ -6,12 +6,13 @@
   "license": "MIT",
   "scripts": {},
   "dependencies": {
-    "@prisma/client": "3.7.0"
+    "@prisma/client": "3.7.0",
+    "prisma-json-schema-generator": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "16.11.7",
-    "prisma": "3.7.0",
     "godspeed-crud-api-generator": "^1.0.2",
+    "prisma": "3.7.0",
     "typescript": "4.5.2"
   }
 }

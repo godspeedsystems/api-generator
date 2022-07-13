@@ -4,8 +4,8 @@ datasource db {
 }
 
 generator godspeed {
-  provider = "node ../../node_modules/godspeed-crud-api-generator"
-  output   = "../auto-generated-crud"
+  provider = "godspeed-crud-api-generator"
+  output   = "./"
 }
 
 model Comment {

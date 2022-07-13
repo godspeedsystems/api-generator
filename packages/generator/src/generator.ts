@@ -20,8 +20,6 @@ generatorHandler({
     if (options.generator.output) {
       const jsonSchema = transformDMMF(options.dmmf, options.generator.config)
 
-      // console.log(JSON.stringify(jsonSchema, null, 2))
-
       try {
         let basePathForGeneration = parseEnvValue(options.generator.output)
         let dataSourceName =

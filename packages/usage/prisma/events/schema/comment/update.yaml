@@ -1,0 +1,19 @@
+/comment/:id.http.put:
+  summary: Update a Comment
+  description: Update Comment from database
+  fn: com.biz.schema.comment.update
+  body:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            text:
+              type: string
+              nullable: true
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer

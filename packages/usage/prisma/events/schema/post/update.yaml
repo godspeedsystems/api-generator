@@ -1,0 +1,31 @@
+/post/:id.http.put:
+  summary: Update a Post
+  description: Update Post from database
+  fn: com.biz.schema.post.update
+  body:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            published:
+              type: boolean
+              default: false
+            title:
+              type: string
+            author:
+              anyOf:
+                - $ref: '#/definitions/User'
+                - type: 'null'
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer

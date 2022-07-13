@@ -7,6 +7,7 @@ import assert from 'assert'
 const jsYaml = require('js-yaml')
 
 export type METHOD = 'one' | 'create' | 'update' | 'delete'
+
 type EventConfig = {
   dataSourceName: string
   modelFields: DMMF.Field[]
@@ -14,14 +15,20 @@ type EventConfig = {
   method: METHOD
 }
 
+const findIndexField = (modelFields: DMMF.Field[]): DMMF.Field | undefined => {
+  let indexField = modelFields.find(
+    ({ isId }: { isId: DMMF.Field['isId'] }) => isId,
+  )
+
+  return indexField
+}
+
 const generateEventKey = ({
   modelName,
   modelFields,
   method,
 }: EventConfig): string => {
-  let indexField = modelFields.find(
-    ({ isId }: { isId: DMMF.Field['isId'] }) => isId,
-  )
+  let indexField = findIndexField(modelFields)
 
   switch (method) {
     case 'one':
@@ -87,14 +94,19 @@ type Body = {
 
 type BodyAndParams = {
   body?: Body
-  params: Param[]
+  params: Param[] | undefined
 }
 
 const generateBodyAndParamsFromJsonSchema = (
   method: METHOD,
   modelName: string,
   jsonSchema: JSONSchema7,
+  modelFields: DMMF.Field[],
 ): BodyAndParams => {
+  // lets find the index field
+  let indexField = findIndexField(modelFields)
+  assert(indexField, 'Model has no index field')
+
   let definitions = jsonSchema['definitions']
   if (definitions) {
     let modelDefinition = definitions[modelName]
@@ -105,7 +117,39 @@ const generateBodyAndParamsFromJsonSchema = (
       `Definition of type boolean unsupported`,
     )
 
-    let { id, ...rest } = modelDefinition.properties ?? {}
+    let sanitizedProperties = Object.keys(
+      modelDefinition.properties ?? {},
+    ).reduce((accumulator: any, propertyName) => {
+      assert(
+        typeof modelDefinition !== 'boolean',
+        `Definition of type boolean unsupported`,
+      )
+
+      if (typeof modelDefinition.properties !== 'undefined') {
+        let property = modelDefinition.properties[propertyName]
+        let _prop: { nullable?: boolean; type?: any } = {}
+
+        if (typeof property !== 'boolean') {
+          if (Array.isArray(property.type)) {
+            if (property.type.find((_) => _ === 'null')) {
+              _prop['nullable'] = true
+              _prop['type'] = property.type[0]
+            }
+            property = {
+              ...property,
+              ..._prop,
+            }
+            accumulator[propertyName] = property
+            return accumulator
+          } else {
+            accumulator[propertyName] = property
+            return accumulator
+          }
+        }
+      }
+    }, {})
+
+    let { [indexField.name]: id, ...rest } = sanitizedProperties
 
     assert(typeof id !== 'undefined', 'Definition must have property `id`')
     assert(typeof id !== 'boolean', `id of type boolean unsupported`)
@@ -130,9 +174,17 @@ const generateBodyAndParamsFromJsonSchema = (
               },
             }
           : undefined,
-      params: [
-        { name: 'id', in: 'path', required: true, schema: { type: id.type } },
-      ],
+      params:
+        method !== 'create'
+          ? [
+              {
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: { type: Array.isArray(id.type) ? id.type[0] : id.type },
+              },
+            ]
+          : undefined,
     }
   } else {
     return {
@@ -185,6 +237,7 @@ export const generateAndStoreEvent = async (
       method,
       modelName,
       jsonSchema,
+      modelFields,
     )
 
     bodyAndParams = { body, params }

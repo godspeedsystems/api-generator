@@ -1,0 +1,25 @@
+/post.http.post:
+  summary: Create a new Post
+  description: Create Post from database
+  fn: com.biz.schema.post.create
+  body:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            published:
+              type: boolean
+              default: false
+            title:
+              type: string
+            author:
+              anyOf:
+                - $ref: '#/definitions/User'
+                - type: 'null'

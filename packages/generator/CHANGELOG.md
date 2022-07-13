@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.1.0...v1.1.1) (2022-07-12)
+
+
+### Bug Fixes
+
+* lock file ([fc514d8](https://github.com/ashu17706/godspeed-crud-api-generator/commit/fc514d8765b6aa34ee42d61e106522713d55529e))
+
 # [1.1.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.0.3...v1.1.0) (2022-07-12)
 
 

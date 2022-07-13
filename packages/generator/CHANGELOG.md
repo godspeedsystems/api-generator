@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.1.1...v1.1.2) (2022-07-13)
+
+
+### Bug Fixes
+
+* jsonSchema to openAPI ([4bb28a2](https://github.com/ashu17706/godspeed-crud-api-generator/commit/4bb28a211cc8ccf1faae4fc0e88132dea28b2aa4))
+
 ## [1.1.1](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.1.0...v1.1.1) (2022-07-12)
 
 

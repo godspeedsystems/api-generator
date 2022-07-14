@@ -1,4 +1,4 @@
-/comment/:id.http.delete:
+/schema/comment/:id.http.delete:
   summary: Delete a Comment
   description: Delete Comment from database
   fn: com.biz.schema.comment.delete
@@ -7,4 +7,9 @@
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

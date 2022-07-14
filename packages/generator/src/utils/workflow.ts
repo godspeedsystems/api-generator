@@ -70,7 +70,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
       }
     case 'create':
       return {
-        data: `<% inputs.body %>`,
+        data: { data: `<% inputs.body %>` },
       }
     case 'delete':
       return {
@@ -95,7 +95,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
                 : `inputs.params.${indexField?.name}`
             } %>`,
           },
-          data: `<% inputs.body.data %>`,
+          data: `<% inputs.body %>`,
         },
       }
     default:
@@ -147,16 +147,3 @@ export const generateAndStorWorkflow = async (
   await writeFileSafely(writeLocation, jsYaml.dump(json))
   return 'generated all workflows'
 }
-
-/*
-summary: create a new user
-tasks:
-  - id: create_user
-    description: create a new user
-    fn: com.gs.datastore
-    args:
-        datasource: <%inputs.body.db%>
-        data: <% inputs.body.data %>
-        config:
-          method: <% inputs.params.entity_type %>.create
-*/

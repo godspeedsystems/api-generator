@@ -1,4 +1,4 @@
-/comment/:id.http.put:
+/schema/comment/:id.http.put:
   summary: Update a Comment
   description: Update Comment from database
   fn: com.biz.schema.comment.update
@@ -16,4 +16,9 @@
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

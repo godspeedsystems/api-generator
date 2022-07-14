@@ -1,4 +1,4 @@
-/post/:id.http.delete:
+/schema/post/:id.http.delete:
   summary: Delete a Post
   description: Delete Post from database
   fn: com.biz.schema.post.delete
@@ -7,4 +7,9 @@
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

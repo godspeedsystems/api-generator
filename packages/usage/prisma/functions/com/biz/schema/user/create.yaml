@@ -4,6 +4,7 @@ tasks:
     fn: com.gs.datastore
     args:
       datasource: schema
-      data: <% inputs.body %>
+      data:
+        data: <% inputs.body %>
       config:
         method: user.create

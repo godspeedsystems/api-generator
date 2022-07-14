@@ -24,6 +24,7 @@ const findIndexField = (modelFields: DMMF.Field[]): DMMF.Field | undefined => {
 }
 
 const generateEventKey = ({
+  dataSourceName,
   modelName,
   modelFields,
   method,
@@ -32,13 +33,19 @@ const generateEventKey = ({
 
   switch (method) {
     case 'one':
-      return `/${modelName.toLowerCase()}/:${indexField?.name}.http.get`
+      return `/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
+        indexField?.name
+      }.http.get`
     case 'create':
-      return `/${modelName.toLowerCase()}.http.post`
+      return `/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}.http.post`
     case 'update':
-      return `/${modelName.toLowerCase()}/:${indexField?.name}.http.put`
+      return `/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
+        indexField?.name
+      }.http.put`
     case 'delete':
-      return `/${modelName.toLowerCase()}/:${indexField?.name}.http.delete`
+      return `/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
+        indexField?.name
+      }.http.delete`
     default:
       return ''
   }
@@ -94,7 +101,7 @@ type Body = {
 
 type BodyAndParams = {
   body?: Body
-  params: Param[] | undefined
+  params?: Param[] | undefined
 }
 
 const generateBodyAndParamsFromJsonSchema = (
@@ -124,28 +131,51 @@ const generateBodyAndParamsFromJsonSchema = (
         typeof modelDefinition !== 'boolean',
         `Definition of type boolean unsupported`,
       )
-
       if (typeof modelDefinition.properties !== 'undefined') {
         let property = modelDefinition.properties[propertyName]
         let _prop: { nullable?: boolean; type?: any } = {}
 
-        if (typeof property !== 'boolean') {
-          if (Array.isArray(property.type)) {
-            if (property.type.find((_) => _ === 'null')) {
-              _prop['nullable'] = true
-              _prop['type'] = property.type[0]
-            }
-            property = {
-              ...property,
-              ..._prop,
-            }
-            accumulator[propertyName] = property
-            return accumulator
-          } else {
-            accumulator[propertyName] = property
-            return accumulator
+        assert(
+          typeof property !== 'boolean',
+          'Property of type boolean unsupported',
+        )
+
+        if (property.type === 'array') {
+          property = {
+            ...property,
+            items: {
+              type: 'object',
+            },
           }
         }
+
+        if (Array.isArray(property.type)) {
+          if (property.type.find((_) => _ === 'null')) {
+            _prop['nullable'] = true
+            _prop['type'] = property.type[0]
+          }
+          property = {
+            ...property,
+            ..._prop,
+          }
+        }
+
+        if (Array.isArray(property.anyOf)) {
+          if (
+            property.anyOf.find(
+              (_) => typeof _ !== 'boolean' && _.type === 'null',
+            )
+          ) {
+            _prop['type'] = 'object'
+            _prop['nullable'] = true
+          }
+          property = {
+            ..._prop,
+          }
+        }
+
+        accumulator[propertyName] = property
+        return accumulator
       }
     }, {})
 
@@ -181,7 +211,7 @@ const generateBodyAndParamsFromJsonSchema = (
                 name: 'id',
                 in: 'path',
                 required: true,
-                schema: { type: Array.isArray(id.type) ? id.type[0] : id.type },
+                schema: { type: 'string' },
               },
             ]
           : undefined,
@@ -189,7 +219,7 @@ const generateBodyAndParamsFromJsonSchema = (
   } else {
     return {
       body: undefined,
-      params: [],
+      params: undefined,
     }
   }
 }
@@ -200,6 +230,28 @@ const generateFn = (
   dataSourceName: String,
 ): String => {
   return `com.biz.${dataSourceName.toLowerCase()}.${modelName.toLowerCase()}.${method}`
+}
+
+type Responses = {
+  content: {
+    'application/json': {
+      schema: {
+        type: 'object'
+      }
+    }
+  }
+}
+
+const generateResponses = (): Responses => {
+  return {
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+        },
+      },
+    },
+  }
 }
 
 export const generateAndStoreEvent = async (
@@ -230,7 +282,7 @@ export const generateAndStoreEvent = async (
   let description = generateDescriptionBasedOnModelAndMethod(modelName, method)
   let fn = generateFn(method, modelName, dataSourceName)
 
-  let bodyAndParams: BodyAndParams = { params: [] }
+  let bodyAndParams: BodyAndParams = {}
 
   try {
     let { body, params } = generateBodyAndParamsFromJsonSchema(
@@ -245,11 +297,13 @@ export const generateAndStoreEvent = async (
     console.warn(error)
   }
 
+  let responses = generateResponses()
   json[eventKey] = {
     summary,
     description,
     fn,
     ...bodyAndParams,
+    responses,
   }
 
   const writeLocation = generateWriteLocationForMethod(

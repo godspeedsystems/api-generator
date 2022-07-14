@@ -1,4 +1,4 @@
-/post/:id.http.put:
+/schema/post/:id.http.put:
   summary: Update a Post
   description: Update Post from database
   fn: com.biz.schema.post.update
@@ -20,12 +20,19 @@
             title:
               type: string
             author:
-              anyOf:
-                - $ref: '#/definitions/User'
-                - type: 'null'
+              type: object
+              nullable: true
+            authorId:
+              type: integer
+              nullable: true
   params:
     - name: id
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

@@ -1,4 +1,4 @@
-/user/:id.http.put:
+/schema/user/:id.http.put:
   summary: Update a User
   description: Update User from database
   fn: com.biz.schema.user.update
@@ -25,10 +25,15 @@
             posts:
               type: array
               items:
-                $ref: '#/definitions/Post'
+                type: object
   params:
     - name: id
       in: path
       required: true
       schema:
-        type: integer
+        type: string
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

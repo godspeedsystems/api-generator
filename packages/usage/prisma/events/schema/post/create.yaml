@@ -1,4 +1,4 @@
-/post.http.post:
+/schema/post.http.post:
   summary: Create a new Post
   description: Create Post from database
   fn: com.biz.schema.post.create
@@ -20,6 +20,13 @@
             title:
               type: string
             author:
-              anyOf:
-                - $ref: '#/definitions/User'
-                - type: 'null'
+              type: object
+              nullable: true
+            authorId:
+              type: integer
+              nullable: true
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

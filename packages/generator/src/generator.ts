@@ -18,7 +18,9 @@ generatorHandler({
   },
   onGenerate: async (options: GeneratorOptions) => {
     if (options.generator.output) {
-      const jsonSchema = transformDMMF(options.dmmf, options.generator.config)
+      const jsonSchema = transformDMMF(options.dmmf, {
+        keepRelationScalarFields: 'true',
+      })
 
       try {
         let basePathForGeneration = parseEnvValue(options.generator.output)

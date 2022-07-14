@@ -1,4 +1,4 @@
-/comment.http.post:
+/schema/comment.http.post:
   summary: Create a new Comment
   description: Create Comment from database
   fn: com.biz.schema.comment.create
@@ -11,3 +11,8 @@
             text:
               type: string
               nullable: true
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

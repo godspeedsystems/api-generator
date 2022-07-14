@@ -7,6 +7,6 @@ tasks:
       data:
         where:
           id: <% std.parseInt(inputs.params.id) %>
-        data: <% inputs.body.data %>
+        data: <% inputs.body %>
       config:
         method: Comment.update

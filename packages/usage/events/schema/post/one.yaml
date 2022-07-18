@@ -1,0 +1,15 @@
+/schema/post/:id.http.get:
+  summary: Fetch Post
+  description: Fetch Post from database
+  fn: com.biz.schema.post.one
+  params:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    content:
+      application/json:
+        schema:
+          type: object

@@ -4,12 +4,15 @@
   "version": "1.0.0",
   "main": "src/app.js",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "gen-apis": "godspeed-crud-api-generator"
+  },
   "dependencies": {
     "@prisma/client": "3.7.0",
     "prisma-json-schema-generator": "^3.0.0"
   },
   "devDependencies": {
+    "@types/glob": "^7.2.0",
     "@types/node": "16.11.7",
     "godspeed-crud-api-generator": "^1.0.2",
     "prisma": "3.7.0",

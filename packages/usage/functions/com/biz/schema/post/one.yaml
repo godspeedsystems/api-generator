@@ -1,0 +1,11 @@
+summary: Fetch Post
+tasks:
+  - id: schema_post_one
+    fn: com.gs.datastore
+    args:
+      datasource: schema
+      data:
+        where:
+          id: <% std.parseInt(inputs.params.id) %>
+      config:
+        method: post.findUnique

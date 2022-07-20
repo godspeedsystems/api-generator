@@ -17,7 +17,6 @@ const findSchemas = (schemaDir: string): Promise<string[]> => {
         if (err) {
           return reject(err)
         } else {
-          console.log(schemaFilePaths)
           if (schemaFilePaths.length) {
             return resolve(schemaFilePaths)
           } else {
@@ -29,76 +28,107 @@ const findSchemas = (schemaDir: string): Promise<string[]> => {
   })
 }
 
+const getUserResponseFromCLI: any = async (scannedSchemasPaths: string[]) => {
+  // dict  { schemaName: schemaPath }
+  let schemas = scannedSchemasPaths.map((path: string) => ({
+    schemaName: path.slice(path.lastIndexOf('/') + 1).replace('.prisma', ''),
+    schemaPath: path,
+  }))
+
+  console.log(chalk.white('Select schema to generate CRUD apis.'))
+
+  let { value: selectedSchema } = await cliSelect({
+    values: [
+      ...schemas,
+      { schemaName: 'For all', schemaPath: '' },
+      { schemaName: 'Cancel', schemaPath: '' },
+    ],
+    valueRenderer: (value, selected) => {
+      if (selected) {
+        return value.schemaName === 'Cancel'
+          ? chalk.red(value.schemaName)
+          : chalk.blue(value.schemaName)
+      } else {
+        return value.schemaName
+      }
+    },
+  })
+
+  return { selectedSchema, allSchemas: schemas }
+}
+
+const invokeGenerationForSchema = async ({
+  schemaName,
+  schemaPath,
+}: {
+  schemaName: string
+  schemaPath: string
+}) => {
+  const samplePrismaSchema = getSchemaSync(schemaPath)
+  let dmmf = await getDMMF({
+    datamodel: samplePrismaSchema,
+  })
+
+  const jsonSchema = transformDMMF(dmmf, {
+    keepRelationScalarFields: 'true',
+  })
+  let basePathForGeneration = './src'
+
+  dmmf.datamodel.models.forEach(async (modelInfo) => {
+    const METHODS: METHOD[] = ['one', 'create', 'update', 'delete']
+
+    METHODS.map(async (method) => {
+      await generateAndStoreEvent({
+        basePathForGeneration,
+        modelName: modelInfo.name,
+        dataSourceName: schemaName,
+        modelFields: modelInfo.fields,
+        method,
+        jsonSchema,
+      })
+
+      // workflows generation for each corresponding crud
+      await generateAndStorWorkflow({
+        basePathForGeneration,
+        modelName: modelInfo.name,
+        dataSourceName: schemaName,
+        modelFields: modelInfo.fields,
+        method,
+      })
+    })
+  })
+
+  console.log(
+    chalk.green(`Events and Workflows are generated for ${schemaName}`),
+  )
+}
+
 const generateCrudAPIs = async () => {
   try {
     let schemaDir = path.join(process.cwd() + '/src/datasources/')
 
     // find .prisma schemas
-    let schemas = await findSchemas(schemaDir)
+    let scannedSchemasPaths = await findSchemas(schemaDir)
+    let { selectedSchema, allSchemas } = await getUserResponseFromCLI(
+      scannedSchemasPaths,
+    )
 
-    // dict  {schemaName: schemaPath }
-    let schemasObj = schemas.map((path: string) => ({
-      schemaName: path.slice(path.lastIndexOf('/') + 1).replace('.prisma', ''),
-      schemaPath: path,
-    }))
-
-    console.log(chalk.white('Select schema to generate CRUD apis'))
-
-    let { value: selectedSchema } = await cliSelect({
-      values: schemasObj,
-      valueRenderer: (value, selected) => {
-        if (selected) {
-          return chalk.blue(value.schemaName)
-        } else {
-          return value.schemaName
-        }
-      },
-    })
-
-    const samplePrismaSchema = getSchemaSync(selectedSchema.schemaPath)
-
-    let dmmf = await getDMMF({
-      datamodel: samplePrismaSchema,
-    })
-
-    const jsonSchema = transformDMMF(dmmf, {
-      keepRelationScalarFields: 'true',
-    })
-
-    let basePathForGeneration = './src'
-
-    dmmf.datamodel.models.forEach(async (modelInfo) => {
-      const METHODS: METHOD[] = ['one', 'create', 'update', 'delete']
-
-      METHODS.map((method) => {
-        generateAndStoreEvent({
-          basePathForGeneration,
-          modelName: modelInfo.name,
-          dataSourceName: selectedSchema.schemaName,
-          modelFields: modelInfo.fields,
-          method,
-          jsonSchema,
-        })
-
-        // workflows generation for each corresponding crud
-        generateAndStorWorkflow({
-          basePathForGeneration,
-          modelName: modelInfo.name,
-          dataSourceName: selectedSchema.schemaName,
-          modelFields: modelInfo.fields,
-          method,
-        })
-      })
-    })
+    if (selectedSchema.schemaName === 'For all') {
+      allSchemas.map(
+        async (schema: { schemaName: string; schemaPath: string }) => {
+          await invokeGenerationForSchema(schema)
+        },
+      )
+    } else if (selectedSchema.schemaName === 'Cancel') {
+      throw Error('Auto API generation canceled.')
+    } else {
+      await invokeGenerationForSchema(selectedSchema)
+    }
   } catch (error) {
     throw error
   }
 }
 
-generateCrudAPIs()
-  .then(() => {
-    console.log(chalk.green('APIs are generated.'))
-  })
-  .catch((error) => {
-    console.error(chalk.red(error))
-  })
+generateCrudAPIs().catch((error) => {
+  console.log(chalk.red(error))
+})

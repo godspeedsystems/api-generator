@@ -11,11 +11,13 @@ const chalk = require('chalk')
 const findSchemas = (schemaDir: string): Promise<string[]> => {
   return new Promise((resolve, reject) => {
     glob(
-      schemaDir + '/*.?(prisma)',
+      schemaDir + '/**/*.?(prisma)',
+      { ignore: '/**/generated-clients/**/*.?(prisma)' },
       (err: Error | null, schemaFilePaths: string[]) => {
         if (err) {
           return reject(err)
         } else {
+          console.log(schemaFilePaths)
           if (schemaFilePaths.length) {
             return resolve(schemaFilePaths)
           } else {
@@ -95,7 +97,7 @@ const generateCrudAPIs = async () => {
 
 generateCrudAPIs()
   .then(() => {
-    console.log(chalk.green('APIs are generated'))
+    console.log(chalk.green('APIs are generated.'))
   })
   .catch((error) => {
     console.error(chalk.red(error))

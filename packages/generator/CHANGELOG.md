@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.2.0...v1.3.0) (2022-07-20)
+
+
+### Bug Fixes
+
+* scan in datasources nth level and ignore generated clients ([985d3a9](https://github.com/ashu17706/godspeed-crud-api-generator/commit/985d3a9745b90b303cd901f58f73489d73ee29de))
+
+
+### Features
+
+* support for all at once, graceful abort ([c19c82b](https://github.com/ashu17706/godspeed-crud-api-generator/commit/c19c82bbc4c1a9d843256a9a9ca5c77978a9455e))
+
 # [1.2.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.1.3...v1.2.0) (2022-07-18)
 
 

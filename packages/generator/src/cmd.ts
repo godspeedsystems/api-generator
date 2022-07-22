@@ -75,7 +75,7 @@ const invokeGenerationForSchema = async ({
   let basePathForGeneration = './src'
 
   dmmf.datamodel.models.forEach(async (modelInfo) => {
-    const METHODS: METHOD[] = ['one', 'create', 'update', 'delete']
+    const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
 
     METHODS.map(async (method) => {
       await generateAndStoreEvent({

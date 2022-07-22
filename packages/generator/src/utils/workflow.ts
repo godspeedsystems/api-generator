@@ -4,7 +4,7 @@ import { writeFileSafely } from './writeFileSafely'
 
 const jsYaml = require('js-yaml')
 
-export type METHOD = 'one' | 'create' | 'update' | 'delete'
+export type METHOD = 'one' | 'create' | 'update' | 'delete' | 'search'
 type WorkflowConfig = {
   dataSourceName: string
   modelFields: DMMF.Field[]
@@ -25,6 +25,8 @@ const generateSummaryBasedOnModelAndMethod = (
       return `Update ${modelName}`
     case 'delete':
       return `Delete ${modelName}`
+    case 'search':
+      return `Fetch many ${modelName}`
     default:
       return ''
   }
@@ -48,6 +50,8 @@ const generateDsMethod = (modelName: string, method: METHOD): string => {
       return `${modelName.toLowerCase()}.delete`
     case 'update':
       return `${modelName}.update`
+    case 'search':
+      return `${modelName}.findMany`
     default:
       return ''
   }
@@ -84,7 +88,6 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
           },
         },
       }
-    // <js% Integer.parseInt(`inputs.params.${indexField?.name})`) %>
     case 'update':
       return {
         data: {
@@ -97,6 +100,10 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
           },
           data: `<% inputs.body %>`,
         },
+      }
+    case 'search':
+      return {
+        data: `<% inputs.body %>`,
       }
     default:
       return ''

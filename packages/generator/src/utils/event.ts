@@ -6,7 +6,7 @@ import assert from 'assert'
 
 const jsYaml = require('js-yaml')
 
-export type METHOD = 'one' | 'create' | 'update' | 'delete'
+export type METHOD = 'one' | 'create' | 'update' | 'delete' | 'search'
 
 type EventConfig = {
   dataSourceName: string
@@ -46,6 +46,8 @@ const generateEventKey = ({
       return `/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
         indexField?.name
       }.http.delete`
+    case 'search':
+      return `/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/search.http.post`
     default:
       return ''
   }
@@ -64,6 +66,8 @@ const generateSummaryBasedOnModelAndMethod = (
       return `Update a ${modelName}`
     case 'delete':
       return `Delete a ${modelName}`
+    case 'search':
+      return `Fetch multiple ${modelName}`
     default:
       return ''
   }
@@ -82,6 +86,8 @@ const generateDescriptionBasedOnModelAndMethod = (
       return `Update ${modelName} from database`
     case 'delete':
       return `Delete ${modelName} from database`
+    case 'search':
+      return `Fetch multiple ${modelName} from database`
     default:
       return ''
   }
@@ -203,9 +209,19 @@ const generateBodyAndParamsFromJsonSchema = (
                 },
               },
             }
+          : method === 'search'
+          ? {
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                  },
+                },
+              },
+            }
           : undefined,
       params:
-        method !== 'create'
+        method !== 'create' && method !== 'search'
           ? [
               {
                 name: 'id',
@@ -236,21 +252,33 @@ type Responses = {
   content: {
     'application/json': {
       schema: {
-        type: 'object'
+        type: 'object' | 'array'
       }
     }
   }
 }
 
-const generateResponses = (): Responses => {
-  return {
-    content: {
-      'application/json': {
-        schema: {
-          type: 'object',
+const generateResponses = (method: METHOD): Responses => {
+  if (method === 'search') {
+    return {
+      content: {
+        'application/json': {
+          schema: {
+            type: 'array',
+          },
         },
       },
-    },
+    }
+  } else {
+    return {
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+          },
+        },
+      },
+    }
   }
 }
 
@@ -297,7 +325,7 @@ export const generateAndStoreEvent = async (
     console.warn(error)
   }
 
-  let responses = generateResponses()
+  let responses = generateResponses(method)
   json[eventKey] = {
     summary,
     description,

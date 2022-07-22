@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.3.0...v1.4.0) (2022-07-22)
+
+
+### Features
+
+* added search API generation ([54a5fd1](https://github.com/ashu17706/godspeed-crud-api-generator/commit/54a5fd1e1bc4b35180b7714cfaae471953039f40))
+
 # [1.3.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.2.0...v1.3.0) (2022-07-20)
 
 

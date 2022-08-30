@@ -1,5 +1,5 @@
 import { generatorHandler, GeneratorOptions } from '@prisma/generator-helper'
-import { logger, parseEnvValue } from '@prisma/sdk'
+import { logger, parseEnvValue } from '@prisma/internals'
 
 import { transformDMMF } from 'prisma-json-schema-generator/dist/generator/transformDMMF'
 

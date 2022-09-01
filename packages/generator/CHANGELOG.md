@@ -1,3 +1,12 @@
+## [1.4.1](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.0...v1.4.1) (2022-09-01)
+
+
+### Bug Fixes
+
+* index column name while generating crud apis ([0f57d1d](https://github.com/ashu17706/godspeed-crud-api-generator/commit/0f57d1d818d8a7f49657d4c28bbb5f6302d70eaf))
+* previewFeatures error while generating ([52cb433](https://github.com/ashu17706/godspeed-crud-api-generator/commit/52cb433a44ffa92a9fe85b2409c57e0b532b8db6))
+* updated package-lock.json ([904c6dc](https://github.com/ashu17706/godspeed-crud-api-generator/commit/904c6dc399a72b78f90224793c4c573be0607b14))
+
 # [1.4.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.3.0...v1.4.0) (2022-07-22)
 
 

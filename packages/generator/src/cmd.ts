@@ -1,4 +1,4 @@
-import { getDMMF, getSchemaSync } from '@prisma/sdk'
+import { getDMMF, getSchemaSync } from '@prisma/internals'
 import glob from 'glob'
 import cliSelect from 'cli-select'
 import { generateAndStorWorkflow } from './utils/workflow'

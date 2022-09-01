@@ -224,7 +224,7 @@ const generateBodyAndParamsFromJsonSchema = (
         method !== 'create' && method !== 'search'
           ? [
               {
-                name: 'id',
+                name: indexField.name,
                 in: 'path',
                 required: true,
                 schema: { type: 'string' },

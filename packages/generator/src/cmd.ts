@@ -1,45 +1,28 @@
 import { getDMMF, getSchemaSync } from '@prisma/internals'
-import glob from 'glob'
+
 import cliSelect from 'cli-select'
+import path from 'path'
+
 import { generateAndStorWorkflow } from './utils/workflow'
 import { generateAndStoreEvent } from './utils/event'
-import type { METHOD } from './utils/workflow'
+
 import { transformDMMF } from 'prisma-json-schema-generator/dist/generator/transformDMMF'
-import path from 'path'
+import type { METHOD } from './utils/workflow'
+import findDatasources from './helpers/findDatasources'
+
 const chalk = require('chalk')
 
-const findSchemas = (schemaDir: string): Promise<string[]> => {
-  return new Promise((resolve, reject) => {
-    glob(
-      schemaDir + '/**/*.?(prisma)',
-      { ignore: '/**/generated-clients/**/*.?(prisma)' },
-      (err: Error | null, schemaFilePaths: string[]) => {
-        if (err) {
-          return reject(err)
-        } else {
-          if (schemaFilePaths.length) {
-            return resolve(schemaFilePaths)
-          } else {
-            reject(`Can't find any prisma schema's at ${schemaDir}`)
-          }
-        }
-      },
-    )
-  })
-}
-
-const getUserResponseFromCLI: any = async (scannedSchemasPaths: string[]) => {
-  // dict  { schemaName: schemaPath }
-  let schemas = scannedSchemasPaths.map((path: string) => ({
+const getUserResponseFromCLI: any = async (eligibleDatasources: string[]) => {
+  let allDatasources = eligibleDatasources.map((path: string) => ({
     schemaName: path.slice(path.lastIndexOf('/') + 1).replace('.prisma', ''),
     schemaPath: path,
   }))
 
-  console.log(chalk.white('Select schema to generate CRUD apis.'))
+  console.log(chalk.white('Select datasource / schema to generate CRUD APIs'))
 
-  let { value: selectedSchema } = await cliSelect({
+  let { value: selectedDatasource } = await cliSelect({
     values: [
-      ...schemas,
+      ...allDatasources,
       { schemaName: 'For all', schemaPath: '' },
       { schemaName: 'Cancel', schemaPath: '' },
     ],
@@ -54,7 +37,7 @@ const getUserResponseFromCLI: any = async (scannedSchemasPaths: string[]) => {
     },
   })
 
-  return { selectedSchema, allSchemas: schemas }
+  return { selectedDatasource, allDatasources }
 }
 
 const invokeGenerationForSchema = async ({
@@ -105,24 +88,26 @@ const invokeGenerationForSchema = async ({
 
 const generateCrudAPIs = async () => {
   try {
-    let schemaDir = path.join(process.cwd() + '/src/datasources/')
+    let datasourceDir = path.join(process.cwd() + '/src/datasources/')
 
-    // find .prisma schemas
-    let scannedSchemasPaths = await findSchemas(schemaDir)
-    let { selectedSchema, allSchemas } = await getUserResponseFromCLI(
-      scannedSchemasPaths,
+    // find eligible datasource, as of now elastickgraph and prisma are eligible
+    // for auto generation, and here onwards let's consider .prisma also as a datasource
+    let eligibleDatasources = await findDatasources(datasourceDir)
+
+    let { selectedDatasource, allDatasources } = await getUserResponseFromCLI(
+      eligibleDatasources,
     )
 
-    if (selectedSchema.schemaName === 'For all') {
-      allSchemas.map(
+    if (selectedDatasource.schemaName === 'For all') {
+      allDatasources.map(
         async (schema: { schemaName: string; schemaPath: string }) => {
           await invokeGenerationForSchema(schema)
         },
       )
-    } else if (selectedSchema.schemaName === 'Cancel') {
+    } else if (selectedDatasource.schemaName === 'Cancel') {
       throw Error('Auto API generation canceled.')
     } else {
-      await invokeGenerationForSchema(selectedSchema)
+      await invokeGenerationForSchema(selectedDatasource)
     }
   } catch (error) {
     throw error

@@ -66,7 +66,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
           where: {
             [`${indexField?.name}`]: `<% ${
               indexField?.type === 'Int'
-                ? `std.parseInt(inputs.params.${indexField?.name})`
+                ? `parseInt(inputs.params.${indexField?.name})`
                 : `inputs.params.${indexField?.name}`
             } %>`,
           },
@@ -82,7 +82,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
           where: {
             [`${indexField?.name}`]: `<% ${
               indexField?.type === 'Int'
-                ? `std.parseInt(inputs.params.${indexField?.name})`
+                ? `parseInt(inputs.params.${indexField?.name})`
                 : `inputs.params.${indexField?.name}`
             } %>`,
           },
@@ -94,7 +94,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
           where: {
             [`${indexField?.name}`]: `<% ${
               indexField?.type === 'Int'
-                ? `std.parseInt(inputs.params.${indexField?.name})`
+                ? `parseInt(inputs.params.${indexField?.name})`
                 : `inputs.params.${indexField?.name}`
             } %>`,
           },

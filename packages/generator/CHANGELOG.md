@@ -1,3 +1,17 @@
+## [1.4.3](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.2...v1.4.3) (2022-09-12)
+
+
+### Bug Fixes
+
+* std.parseInt to parseInt ([3b85357](https://github.com/ashu17706/godspeed-crud-api-generator/commit/3b853574dc7287af444a9df925b81766ac9d1c14))
+
+## [1.4.2](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.1...v1.4.2) (2022-09-07)
+
+
+### Bug Fixes
+
+* added usages in .gitognore ([fee4349](https://github.com/ashu17706/godspeed-crud-api-generator/commit/fee43496cbdff4e9f5ecb6fad0108bf794775cc1))
+
 ## [1.4.1](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.0...v1.4.1) (2022-09-01)
 
 

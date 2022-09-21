@@ -1,10 +1,19 @@
 import { glob } from 'glob'
+import * as yaml from 'js-yaml'
+import fs from 'fs'
 
-type dsDefinition = {
+export type dsDefinition = {
   dsType: 'prisma' | 'elasticgraph'
   dsName: string
   dsFilePath: string
-  dsConfig?: string
+  dsConfig?: object
+}
+
+export type egDatasourceConfig = {
+  type: 'elasticgraph'
+  schema_backend: string
+  deep: boolean
+  collect: boolean
 }
 
 const findDatasources = (datasourceDir: string): Promise<dsDefinition[]> => {
@@ -19,25 +28,50 @@ const findDatasources = (datasourceDir: string): Promise<dsDefinition[]> => {
           return reject(err)
         } else {
           if (datasourcePaths.length) {
-            // filterout prisma, yaml
-            // and make an object like
-            // { dsType: 'prisma|elasticgraph', dsName: 'remove extention',  dsFilePath: 'path to the file', dsConfig: 'only availble for non prisma datasource'}
+            /**
+             * filterout prisma, yaml and make an object like
+             * {
+             *    dsType: 'prisma|elasticgraph',
+             *    dsName: 'remove extention',
+             *    dsFilePath: 'path to the file',
+             *    dsConfig: 'only availble for non prisma datasource'
+             * }
+             **/
+
             let dsDefinitions: dsDefinition[] = datasourcePaths.map(
               (datasourcePath) => {
                 let _dsDefinition: dsDefinition = {
-                  dsType: datasourcePath.lastIndexOf('.prisma')
-                    ? 'prisma'
-                    : 'elasticgraph',
+                  dsType: 'prisma',
                   dsFilePath: datasourcePath,
-                  dsName: '',
-                  dsConfig: '',
+                  dsName: datasourcePath.substring(
+                    datasourcePath.lastIndexOf('/') + 1,
+                  ),
+                }
+
+                if (datasourcePath.includes('.prisma')) {
+                  _dsDefinition.dsType = 'prisma'
+                } else {
+                  try {
+                    let _dsConfig = <egDatasourceConfig>(
+                      yaml.load(
+                        fs.readFileSync(datasourcePath, { encoding: 'utf-8' }),
+                      )
+                    )
+
+                    _dsDefinition.dsType = 'elasticgraph'
+                    _dsDefinition.dsConfig = _dsConfig
+                  } catch (error) {
+                    console.error('error', error)
+                  }
                 }
 
                 return _dsDefinition
               },
             )
+
+            resolve(dsDefinitions)
           } else {
-            reject(`Can't find any prisma schema's at ${datasourceDir}`)
+            reject(`Can't find any valid datasources at ${datasourceDir}`)
           }
         }
       },

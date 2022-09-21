@@ -1,6 +1,6 @@
 import { DMMF } from '@prisma/generator-helper'
-import { generateWriteLocationForMethod } from './generateWriteLocationForMethod'
-import { writeFileSafely } from './writeFileSafely'
+import { generateWriteLocationForMethod } from '../generateWriteLocationForMethod'
+import { writeFileSafely } from '../writeFileSafely'
 import { JSONSchema7 } from 'json-schema'
 import assert from 'assert'
 
@@ -326,6 +326,7 @@ export const generateAndStoreEvent = async (
   }
 
   let responses = generateResponses(method)
+
   json[eventKey] = {
     summary,
     description,

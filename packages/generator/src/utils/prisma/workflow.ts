@@ -1,6 +1,6 @@
 import { DMMF } from '@prisma/generator-helper'
-import { generateWriteLocationForMethod } from './generateWriteLocationForMethod'
-import { writeFileSafely } from './writeFileSafely'
+import { generateWriteLocationForMethod } from '../generateWriteLocationForMethod'
+import { writeFileSafely } from '../writeFileSafely'
 
 const jsYaml = require('js-yaml')
 
@@ -110,7 +110,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
   }
 }
 
-export const generateAndStorWorkflow = async (
+export const generateAndStoreWorkflow = async (
   config: WorkflowConfig & { basePathForGeneration: string },
 ): Promise<string> => {
   let json: any

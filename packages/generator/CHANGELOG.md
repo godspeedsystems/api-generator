@@ -1,3 +1,16 @@
+# [1.5.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.3...v1.5.0) (2022-09-22)
+
+
+### Bug Fixes
+
+* vulnearability ([f6823da](https://github.com/ashu17706/godspeed-crud-api-generator/commit/f6823da90ec9e90cc4451b5bfb24194de477e6b1))
+* work in progress ([f61043e](https://github.com/ashu17706/godspeed-crud-api-generator/commit/f61043ee911606d3d6e14498c3d6f6d3eed719c1))
+
+
+### Features
+
+* elasticgraph api generation ([d57c542](https://github.com/ashu17706/godspeed-crud-api-generator/commit/d57c5429c61699f3dfb58b01b33319d78b2b1383))
+
 ## [1.4.3](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.2...v1.4.3) (2022-09-12)
 
 

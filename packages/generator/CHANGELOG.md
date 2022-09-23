@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.5.0...v1.5.1) (2022-09-23)
+
+
+### Bug Fixes
+
+* removed main ([8e77690](https://github.com/ashu17706/godspeed-crud-api-generator/commit/8e77690fe865af455fe80beb6abb3f59bb7a1c99))
+
 # [1.5.0](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.4.3...v1.5.0) (2022-09-22)
 
 

@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.5.2...v1.5.3) (2022-09-26)
+
+
+### Bug Fixes
+
+* .yml in eg paths ([b392eca](https://github.com/ashu17706/godspeed-crud-api-generator/commit/b392ecafe3f21d140309b1482d415b0ad62b4b53))
+
 ## [1.5.2](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.5.1...v1.5.2) (2022-09-23)
 
 

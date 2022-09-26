@@ -120,7 +120,7 @@ const invokeGenerationForElasticgraphDS = async ({
           METHODS.map(async (method) => {
             await elasticgraphGenerator.eventGen({
               basePathForGeneration,
-              dataSourceName: dsName.replace('.yml', ''),
+              dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
               entityName: entityKey,
               entityFields: entities[entityKey],
               method,
@@ -129,7 +129,7 @@ const invokeGenerationForElasticgraphDS = async ({
             // workflows generation for each corresponding crud
             await elasticgraphGenerator.workflowGen({
               basePathForGeneration,
-              dataSourceName: dsName.replace('.yml', ''),
+              dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
               entityName: entityKey,
               entityFields: entities[entityKey],
               method,

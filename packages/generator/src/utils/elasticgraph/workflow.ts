@@ -37,7 +37,6 @@ const genData = (method: METHOD, entityName: string) => {
     ...(method === 'search' && {
       from: `<% inputs.body.from || 0 %>`,
       size: `<% inputs.body.size || 10 %>`,
-      fields: `<% inputs.body.fields  %>`,
     }),
   }
 }
@@ -49,7 +48,7 @@ const genEgMethod = (method: METHOD, entityName: string) => {
     case 'delete':
       return 'delete'
     case 'update':
-      return 'update'
+      return 'index'
     case 'search':
       return 'search'
     default:

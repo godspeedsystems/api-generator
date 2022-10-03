@@ -5,13 +5,11 @@ export const generateWriteLocationForMethod = (
   subPath: string,
   dsName: string,
   modelName: string,
-  method: string,
+  method?: string,
 ): string => {
-  return path.join(
-    outputPath,
-    subPath,
-    dsName,
-    modelName.toLowerCase(),
-    `${method}.yaml`,
-  )
+  let fileName = method
+    ? path.join(modelName.toLowerCase(), `${method}.yaml`)
+    : `${modelName.toLowerCase()}.yaml`
+
+  return path.join(outputPath, subPath, dsName, fileName)
 }

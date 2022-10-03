@@ -33,11 +33,17 @@ const genData = (method: METHOD, entityName: string) => {
   return {
     index: `${entityName}s`,
     type: '_doc',
-    body: `<% inputs.body %>`,
-    ...(method === 'search' && {
-      from: `<% inputs.body.from || 0 %>`,
-      size: `<% inputs.body.size || 10 %>`,
-    }),
+    ...(method === 'search'
+      ? {
+          query: `<% inputs.body.query %>`,
+          from: `<% inputs.body.from || 0 %>`,
+          size: `<% inputs.body.size || 10 %>`,
+        }
+      : method === 'update'
+      ? { id: `<% inputs.body.id %>`, body: `<% inputs.body %>` }
+      : method === 'delete'
+      ? { id: `<% inputs.body.id %>` }
+      : { body: `<% inputs.body %>` }),
   }
 }
 
@@ -56,14 +62,12 @@ const genEgMethod = (method: METHOD, entityName: string) => {
   }
 }
 
-export const generateAndStoreWorkflow = async (eventConfig: EventConfig) => {
-  let {
-    basePathForGeneration,
-    dataSourceName,
-    entityName,
-    entityFields,
-    method,
-  } = eventConfig
+export const generateAndStoreWorkflow = async (
+  eventConfig: EventConfig,
+  method: METHOD,
+) => {
+  let { basePathForGeneration, dataSourceName, entityName, entityFields } =
+    eventConfig
 
   let json: any
 

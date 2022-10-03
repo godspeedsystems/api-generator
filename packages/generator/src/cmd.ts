@@ -56,19 +56,18 @@ const invokeGenerationForPrismaDS = async ({
   let basePathForGeneration = './src'
 
   dmmf.datamodel.models.forEach(async (modelInfo) => {
+    // {dataModel}.yaml has all the events for each method
+    await prismaGenerator.eventGen({
+      basePathForGeneration,
+      modelName: modelInfo.name,
+      dataSourceName: dsName.replace('.prisma', ''),
+      modelFields: modelInfo.fields,
+      jsonSchema,
+    })
+
+    // each method has a seprate file
     const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
-
     METHODS.map(async (method) => {
-      await prismaGenerator.eventGen({
-        basePathForGeneration,
-        modelName: modelInfo.name,
-        dataSourceName: dsName.replace('.prisma', ''),
-        modelFields: modelInfo.fields,
-        method,
-        jsonSchema,
-      })
-
-      // workflows generation for each corresponding crud
       await prismaGenerator.workflowGen({
         basePathForGeneration,
         modelName: modelInfo.name,
@@ -115,25 +114,25 @@ const invokeGenerationForElasticgraphDS = async ({
         }, {})
 
         Object.keys(entities).forEach(async (entityKey) => {
+          await elasticgraphGenerator.eventGen({
+            basePathForGeneration,
+            dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
+            entityName: entityKey,
+            entityFields: entities[entityKey],
+          })
+
           const METHODS: METHOD[] = ['create', 'update', 'delete', 'search']
-
           METHODS.map(async (method) => {
-            await elasticgraphGenerator.eventGen({
-              basePathForGeneration,
-              dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
-              entityName: entityKey,
-              entityFields: entities[entityKey],
-              method,
-            })
-
             // workflows generation for each corresponding crud
-            await elasticgraphGenerator.workflowGen({
-              basePathForGeneration,
-              dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
-              entityName: entityKey,
-              entityFields: entities[entityKey],
+            await elasticgraphGenerator.workflowGen(
+              {
+                basePathForGeneration,
+                dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
+                entityName: entityKey,
+                entityFields: entities[entityKey],
+              },
               method,
-            })
+            )
           })
         })
       },

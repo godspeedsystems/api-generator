@@ -8,8 +8,8 @@ export type EventConfig = {
   dataSourceName: string
   entityName: string
   entityFields: any
-  method: METHOD
 }
+
 const genEventKey = (
   dataSourceName: string,
   entityName: string,
@@ -21,9 +21,9 @@ const genEventKey = (
     case 'create':
       return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}.http.post`
     case 'update':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/:id.http.put`
+      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}.http.put`
     case 'delete':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/:id.http.delete`
+      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}.http.delete`
     case 'search':
       return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/search.http.post`
     default:
@@ -76,22 +76,27 @@ const processEntityObject = (entityFields: any) => {
   return Object.keys(entityFields).reduce(
     (accumulator: any, fieldKey: string) => {
       let field = entityFields[fieldKey]
-      accumulator[fieldKey] = {
+      let oasCompatibleFieldDescriptor = {
         type: !Array.isArray(field.type)
-          ? field.type.toLowerCase()
+          ? field.type.toLowerCase() === 'date'
+            ? 'string'
+            : field.type.toLowerCase()
           : [field.type[0].toLowerCase()],
+        ...(!Array.isArray(field.type) &&
+          field.type.toLowerCase() === 'date' && { format: 'date-time' }),
       }
+
+      accumulator[fieldKey] = {
+        ...oasCompatibleFieldDescriptor,
+      }
+
       return accumulator
     },
     {},
   )
 }
 
-const genBodyAndParams = (
-  method: METHOD,
-  entityName: String,
-  entityFields: any,
-): any => {
+const genBodyAndParams = (method: METHOD, entityFields: any): any => {
   return {
     body: {
       content: {
@@ -130,42 +135,58 @@ const genResponses = (method: METHOD): any => {
   }
 }
 
-export const generateAndStoreEvent = async (
-  eventConfig: EventConfig,
-): Promise<string> => {
+const generateEvent = (
+  eventConfig: EventConfig & {
+    method: METHOD
+  },
+): any => {
   let json: any = {}
-  let {
-    basePathForGeneration,
-    dataSourceName,
-    entityName,
-    entityFields,
-    method,
-  } = eventConfig
+
+  let { dataSourceName, entityName, entityFields, method } = eventConfig
 
   let eventKey = genEventKey(dataSourceName, entityName, method)
   let summary = genEventSummary(entityName, method)
   let description = genEventDescription(entityName, method)
   let fn = genEventFunction(method, entityName, dataSourceName)
   let responses = genResponses(method)
-  let bodyAndParams = genBodyAndParams(method, entityName, entityFields)
+  let { body } = genBodyAndParams(method, entityFields)
 
-  json[eventKey] = {
+  json.eventKey = eventKey
+
+  json.structure = {
     summary,
     description,
     fn,
-    ...bodyAndParams,
+    body,
     responses,
   }
+
+  return json
+}
+
+export const generateAndStoreEvent = async (
+  eventConfig: EventConfig,
+): Promise<string> => {
+  let json: any = {}
+  let { basePathForGeneration, dataSourceName, entityName, entityFields } =
+    eventConfig
+  const METHODS: METHOD[] = ['create', 'update', 'delete', 'search']
+
+  let consolidateJsonForEvent = METHODS.map((method) => {
+    let content = `# ${method.toUpperCase()}\r\n`
+    let { eventKey, structure } = generateEvent({ ...eventConfig, method })
+    content = content + `${jsYaml.dump({ [eventKey]: structure })}\r\n`
+    return content
+  }).join('')
 
   const writeLocation = generateWriteLocationForMethod(
     basePathForGeneration,
     '/events',
     dataSourceName,
     entityName.toLowerCase(),
-    method,
   )
 
-  await writeFileSafely(writeLocation, jsYaml.dump(json))
+  await writeFileSafely(writeLocation, consolidateJsonForEvent)
 
-  return 'generated all events'
+  return 'Generated all events'
 }

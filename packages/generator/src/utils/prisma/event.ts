@@ -3,32 +3,30 @@ import { generateWriteLocationForMethod } from '../generateWriteLocationForMetho
 import { writeFileSafely } from '../writeFileSafely'
 import { JSONSchema7 } from 'json-schema'
 import assert from 'assert'
+import { generateDefinitionsFile } from './definitions'
 
 const jsYaml = require('js-yaml')
-
 export type METHOD = 'one' | 'create' | 'update' | 'delete' | 'search'
 
 type EventConfig = {
   dataSourceName: string
   modelFields: DMMF.Field[]
   modelName: string
-  method: METHOD
 }
 
-const findIndexField = (modelFields: DMMF.Field[]): DMMF.Field | undefined => {
+export const findIndexField = (
+  modelFields: DMMF.Field[],
+): DMMF.Field | undefined => {
   let indexField = modelFields.find(
     ({ isId }: { isId: DMMF.Field['isId'] }) => isId,
   )
-
   return indexField
 }
 
-const generateEventKey = ({
-  dataSourceName,
-  modelName,
-  modelFields,
-  method,
-}: EventConfig): string => {
+const generateEventKey = (
+  { dataSourceName, modelName, modelFields }: EventConfig,
+  method: METHOD,
+): string => {
   let indexField = findIndexField(modelFields)
 
   switch (method) {
@@ -121,13 +119,13 @@ const generateBodyAndParamsFromJsonSchema = (
   assert(indexField, 'Model has no index field')
 
   let definitions = jsonSchema['definitions']
+
   if (definitions) {
     let modelDefinition = definitions[modelName]
 
-    assert(modelDefinition, `Definition undefined for ${modelName}`)
     assert(
-      typeof modelDefinition !== 'boolean',
-      `Definition of type boolean unsupported`,
+      modelDefinition && typeof modelDefinition !== 'boolean',
+      `Definition undefined or boolean(unsupported) for ${modelName}`,
     )
 
     let sanitizedProperties = Object.keys(
@@ -137,6 +135,7 @@ const generateBodyAndParamsFromJsonSchema = (
         typeof modelDefinition !== 'boolean',
         `Definition of type boolean unsupported`,
       )
+
       if (typeof modelDefinition.properties !== 'undefined') {
         let property = modelDefinition.properties[propertyName]
         let _prop: { nullable?: boolean; type?: any } = {}
@@ -146,17 +145,18 @@ const generateBodyAndParamsFromJsonSchema = (
           'Property of type boolean unsupported',
         )
 
-        if (property.type === 'array') {
-          property = {
-            ...property,
-            items: {
-              type: 'object',
-            },
-          }
-        }
+        // if (property.type === 'array') {
+        //   property = {
+        //     ...property,
+        //     items: {
+        //       type: 'object',
+        //     },
+        //   }
+        // }
 
         if (Array.isArray(property.type)) {
           if (property.type.find((_) => _ === 'null')) {
+            // TODO: investigate in future
             _prop['nullable'] = true
             _prop['type'] = property.type[0]
           }
@@ -166,19 +166,50 @@ const generateBodyAndParamsFromJsonSchema = (
           }
         }
 
-        if (Array.isArray(property.anyOf)) {
-          if (
-            property.anyOf.find(
-              (_) => typeof _ !== 'boolean' && _.type === 'null',
-            )
-          ) {
-            _prop['type'] = 'object'
-            _prop['nullable'] = true
+        if (
+          property.hasOwnProperty('anyOf') ||
+          property.hasOwnProperty('allOf') ||
+          property.hasOwnProperty('oneOf')
+        ) {
+          let _ = property.anyOf || property.allOf || property.oneOf
+          assert(_, 'anyOf/allOf/oneOf not defined')
+
+          let isNullable = false
+          let exceptNull = _.filter((key) =>
+            key && key !== true && key.type !== 'null' ? true : false,
+          )
+          if (exceptNull.length !== _.length) {
+            isNullable = true
           }
+
           property = {
+            [Object.keys(property).length && Object.keys(property)[0]]:
+              exceptNull,
+          }
+
+          isNullable && (_prop['nullable'] = true)
+
+          property = {
+            ...property,
             ..._prop,
           }
         }
+
+        // if (Array.isArray(property.anyOf)) {
+        //   if (
+        //     property.anyOf.find(
+        //       (_) => typeof _ !== 'boolean' && _.type === 'null',
+        //     )
+        //   ) {
+        //     // TODO: refs comes here
+        //     _prop['type'] = 'object'
+        //     // TODO: this can be or can not be null, I guess. investigate more
+        //     _prop['nullable'] = true
+        //   }
+        //   property = {
+        //     ..._prop,
+        //   }
+        // }
 
         accumulator[propertyName] = property
         return accumulator
@@ -240,6 +271,51 @@ const generateBodyAndParamsFromJsonSchema = (
   }
 }
 
+const _generateBodyAndParamsFromJsonSchema = (
+  method: METHOD,
+  modelName: string,
+  jsonSchema: JSONSchema7,
+  modelFields: DMMF.Field[],
+): BodyAndParams => {
+  let indexField = findIndexField(modelFields)
+
+  return {
+    body:
+      method === 'create' || method === 'update'
+        ? {
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: `#/definitions/${modelName}`,
+                },
+              },
+            },
+          }
+        : method === 'search'
+        ? {
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: `#/definitions/${modelName}`,
+                },
+              },
+            },
+          }
+        : undefined,
+    params:
+      method !== 'create' && method !== 'search'
+        ? [
+            {
+              name: indexField ? indexField.name : '',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ]
+        : undefined,
+  }
+}
+
 const generateFn = (
   method: METHOD,
   modelName: String,
@@ -282,29 +358,25 @@ const generateResponses = (method: METHOD): Responses => {
   }
 }
 
-export const generateAndStoreEvent = async (
+const generateEvent = (
   eventConfig: EventConfig & {
-    basePathForGeneration: string
     jsonSchema: JSONSchema7
+    method: METHOD
   },
-): Promise<string> => {
+): any => {
   let json: any = {}
 
-  let {
-    basePathForGeneration,
-    dataSourceName,
-    modelName,
-    method,
-    modelFields,
-    jsonSchema,
-  } = eventConfig
+  let { dataSourceName, modelName, method, modelFields, jsonSchema } =
+    eventConfig
 
-  let eventKey = generateEventKey({
-    dataSourceName: dataSourceName,
-    modelName: modelName,
-    method: method,
-    modelFields: modelFields,
-  })
+  let eventKey = generateEventKey(
+    {
+      dataSourceName: dataSourceName,
+      modelName: modelName,
+      modelFields: modelFields,
+    },
+    method,
+  )
 
   let summary = generateSummaryBasedOnModelAndMethod(modelName, method)
   let description = generateDescriptionBasedOnModelAndMethod(modelName, method)
@@ -313,7 +385,7 @@ export const generateAndStoreEvent = async (
   let bodyAndParams: BodyAndParams = {}
 
   try {
-    let { body, params } = generateBodyAndParamsFromJsonSchema(
+    let { body, params } = _generateBodyAndParamsFromJsonSchema(
       method,
       modelName,
       jsonSchema,
@@ -327,7 +399,8 @@ export const generateAndStoreEvent = async (
 
   let responses = generateResponses(method)
 
-  json[eventKey] = {
+  json.eventKey = eventKey
+  json.structure = {
     summary,
     description,
     fn,
@@ -335,15 +408,51 @@ export const generateAndStoreEvent = async (
     responses,
   }
 
+  return json
+}
+
+export const generateAndStoreEvent = async (
+  eventConfig: EventConfig & {
+    basePathForGeneration: string
+    jsonSchema: JSONSchema7
+  },
+  setDefs: any,
+): Promise<string> => {
+  const {
+    basePathForGeneration,
+    dataSourceName,
+    modelName,
+    modelFields,
+    jsonSchema,
+  } = eventConfig
+
+  const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
+
+  // refs
+  let _defs = generateDefinitionsFile(
+    dataSourceName,
+    modelName,
+    jsonSchema,
+    modelFields,
+  )
+
+  setDefs(_defs)
+
+  let consolidateJsonForEvent = METHODS.map((method) => {
+    let content = `# ${method.toUpperCase()}\r\n`
+    let { eventKey, structure } = generateEvent({ ...eventConfig, method })
+    content = content + `${jsYaml.dump({ [eventKey]: structure })}\r\n`
+    return content
+  }).join('')
+
   const writeLocation = generateWriteLocationForMethod(
     basePathForGeneration,
     '/events',
     dataSourceName,
     modelName.toLowerCase(),
-    method,
   )
 
-  await writeFileSafely(writeLocation, jsYaml.dump(json))
+  await writeFileSafely(writeLocation, consolidateJsonForEvent)
 
-  return 'generated all events'
+  return 'Generated all events'
 }

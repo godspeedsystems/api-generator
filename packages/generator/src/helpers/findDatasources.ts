@@ -3,9 +3,9 @@ import * as yaml from 'js-yaml'
 import fs from 'fs'
 
 export type dsDefinition = {
-  dsType: 'prisma' | 'elasticgraph'
-  dsName: string
-  dsFilePath: string
+  dsType?: 'prisma' | 'elasticgraph'
+  dsName?: string
+  dsFilePath?: string
   dsConfig?: object
 }
 
@@ -38,8 +38,8 @@ const findDatasources = (datasourceDir: string): Promise<dsDefinition[]> => {
              * }
              **/
 
-            let dsDefinitions: dsDefinition[] = datasourcePaths.map(
-              (datasourcePath) => {
+            let dsDefinitions: dsDefinition[] = datasourcePaths
+              .map((datasourcePath) => {
                 let _dsDefinition: dsDefinition = {
                   dsType: 'prisma',
                   dsFilePath: datasourcePath,
@@ -58,16 +58,21 @@ const findDatasources = (datasourceDir: string): Promise<dsDefinition[]> => {
                       )
                     )
 
-                    _dsDefinition.dsType = 'elasticgraph'
-                    _dsDefinition.dsConfig = _dsConfig
+                    if (_dsConfig.type === 'elasticgraph') {
+                      _dsDefinition.dsType = 'elasticgraph'
+                      _dsDefinition.dsConfig = _dsConfig
+                    } else {
+                      _dsDefinition = {}
+                    }
                   } catch (error) {
                     console.error('error', error)
                   }
                 }
 
                 return _dsDefinition
-              },
-            )
+              })
+              // remove the empty objects
+              .filter((ds) => Object.keys(ds).length)
 
             resolve(dsDefinitions)
           } else {

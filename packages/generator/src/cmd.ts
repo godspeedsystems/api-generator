@@ -13,7 +13,9 @@ import findDatasources, { egDatasourceConfig } from './helpers/findDatasources'
 import type { dsDefinition } from './helpers/findDatasources'
 import { glob } from 'glob'
 import * as toml from 'toml'
+import { writeFileSafely } from './utils/writeFileSafely'
 
+const jsYaml = require('js-yaml')
 const chalk = require('chalk')
 
 const getUserResponseFromCLI: any = async (
@@ -53,17 +55,25 @@ const invokeGenerationForPrismaDS = async ({
   const jsonSchema = transformDMMF(dmmf, {
     keepRelationScalarFields: 'true',
   })
-  let basePathForGeneration = './src'
 
+  let basePathForGeneration = './src'
+  let defs: any = {}
+  const setDefs = (def: any) => {
+    defs = { ...defs, ...def }
+  }
   dmmf.datamodel.models.forEach(async (modelInfo) => {
     // {dataModel}.yaml has all the events for each method
-    await prismaGenerator.eventGen({
-      basePathForGeneration,
-      modelName: modelInfo.name,
-      dataSourceName: dsName.replace('.prisma', ''),
-      modelFields: modelInfo.fields,
-      jsonSchema,
-    })
+
+    await prismaGenerator.eventGen(
+      {
+        basePathForGeneration,
+        modelName: modelInfo.name,
+        dataSourceName: (dsName || '').replace('.prisma', ''),
+        modelFields: modelInfo.fields,
+        jsonSchema,
+      },
+      setDefs,
+    )
 
     // each method has a seprate file
     const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
@@ -71,12 +81,17 @@ const invokeGenerationForPrismaDS = async ({
       await prismaGenerator.workflowGen({
         basePathForGeneration,
         modelName: modelInfo.name,
-        dataSourceName: dsName.replace('.prisma', ''),
+        dataSourceName: (dsName || '').replace('.prisma', ''),
         modelFields: modelInfo.fields,
         method,
       })
     })
   })
+
+  writeFileSafely(
+    `./src/definitions/${(dsName || '').replace('.prisma', '')}.yaml`,
+    jsYaml.dump(defs),
+  )
 
   console.log(chalk.green(`Events and Workflows are generated for ${dsName}`))
 }
@@ -116,7 +131,7 @@ const invokeGenerationForElasticgraphDS = async ({
         Object.keys(entities).forEach(async (entityKey) => {
           await elasticgraphGenerator.eventGen({
             basePathForGeneration,
-            dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
+            dataSourceName: (dsName || '').replace(/(.yml|.yaml)/, ''),
             entityName: entityKey,
             entityFields: entities[entityKey],
           })
@@ -127,7 +142,7 @@ const invokeGenerationForElasticgraphDS = async ({
             await elasticgraphGenerator.workflowGen(
               {
                 basePathForGeneration,
-                dataSourceName: dsName.replace(/(.yml|.yaml)/, ''),
+                dataSourceName: (dsName || '').replace(/(.yml|.yaml)/, ''),
                 entityName: entityKey,
                 entityFields: entities[entityKey],
               },

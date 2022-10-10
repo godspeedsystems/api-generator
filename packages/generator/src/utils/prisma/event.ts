@@ -3,9 +3,9 @@ import { generateWriteLocationForMethod } from '../generateWriteLocationForMetho
 import { writeFileSafely } from '../writeFileSafely'
 import { JSONSchema7 } from 'json-schema'
 import assert from 'assert'
+import { generateDefinitionsFile } from './definitions'
 
 const jsYaml = require('js-yaml')
-
 export type METHOD = 'one' | 'create' | 'update' | 'delete' | 'search'
 
 type EventConfig = {
@@ -14,11 +14,12 @@ type EventConfig = {
   modelName: string
 }
 
-const findIndexField = (modelFields: DMMF.Field[]): DMMF.Field | undefined => {
+export const findIndexField = (
+  modelFields: DMMF.Field[],
+): DMMF.Field | undefined => {
   let indexField = modelFields.find(
     ({ isId }: { isId: DMMF.Field['isId'] }) => isId,
   )
-
   return indexField
 }
 
@@ -270,6 +271,51 @@ const generateBodyAndParamsFromJsonSchema = (
   }
 }
 
+const _generateBodyAndParamsFromJsonSchema = (
+  method: METHOD,
+  modelName: string,
+  jsonSchema: JSONSchema7,
+  modelFields: DMMF.Field[],
+): BodyAndParams => {
+  let indexField = findIndexField(modelFields)
+
+  return {
+    body:
+      method === 'create' || method === 'update'
+        ? {
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: `#/definitions/${modelName}`,
+                },
+              },
+            },
+          }
+        : method === 'search'
+        ? {
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: `#/definitions/${modelName}`,
+                },
+              },
+            },
+          }
+        : undefined,
+    params:
+      method !== 'create' && method !== 'search'
+        ? [
+            {
+              name: indexField ? indexField.name : '',
+              in: 'path',
+              required: true,
+              schema: { type: 'string' },
+            },
+          ]
+        : undefined,
+  }
+}
+
 const generateFn = (
   method: METHOD,
   modelName: String,
@@ -339,7 +385,7 @@ const generateEvent = (
   let bodyAndParams: BodyAndParams = {}
 
   try {
-    let { body, params } = generateBodyAndParamsFromJsonSchema(
+    let { body, params } = _generateBodyAndParamsFromJsonSchema(
       method,
       modelName,
       jsonSchema,
@@ -370,9 +416,27 @@ export const generateAndStoreEvent = async (
     basePathForGeneration: string
     jsonSchema: JSONSchema7
   },
+  setDefs: any,
 ): Promise<string> => {
-  const { basePathForGeneration, dataSourceName, modelName } = eventConfig
+  const {
+    basePathForGeneration,
+    dataSourceName,
+    modelName,
+    modelFields,
+    jsonSchema,
+  } = eventConfig
+
   const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
+
+  // refs
+  let _defs = generateDefinitionsFile(
+    dataSourceName,
+    modelName,
+    jsonSchema,
+    modelFields,
+  )
+
+  setDefs(_defs)
 
   let consolidateJsonForEvent = METHODS.map((method) => {
     let content = `# ${method.toUpperCase()}\r\n`

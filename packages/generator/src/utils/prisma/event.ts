@@ -108,174 +108,12 @@ type BodyAndParams = {
   params?: Param[] | undefined
 }
 
-const generateBodyAndParamsFromJsonSchema = (
-  method: METHOD,
-  modelName: string,
-  jsonSchema: JSONSchema7,
-  modelFields: DMMF.Field[],
-): BodyAndParams => {
-  // lets find the index field
-  let indexField = findIndexField(modelFields)
-  assert(indexField, 'Model has no index field')
-
-  let definitions = jsonSchema['definitions']
-
-  if (definitions) {
-    let modelDefinition = definitions[modelName]
-
-    assert(
-      modelDefinition && typeof modelDefinition !== 'boolean',
-      `Definition undefined or boolean(unsupported) for ${modelName}`,
-    )
-
-    let sanitizedProperties = Object.keys(
-      modelDefinition.properties ?? {},
-    ).reduce((accumulator: any, propertyName) => {
-      assert(
-        typeof modelDefinition !== 'boolean',
-        `Definition of type boolean unsupported`,
-      )
-
-      if (typeof modelDefinition.properties !== 'undefined') {
-        let property = modelDefinition.properties[propertyName]
-        let _prop: { nullable?: boolean; type?: any } = {}
-
-        assert(
-          typeof property !== 'boolean',
-          'Property of type boolean unsupported',
-        )
-
-        // if (property.type === 'array') {
-        //   property = {
-        //     ...property,
-        //     items: {
-        //       type: 'object',
-        //     },
-        //   }
-        // }
-
-        if (Array.isArray(property.type)) {
-          if (property.type.find((_) => _ === 'null')) {
-            // TODO: investigate in future
-            _prop['nullable'] = true
-            _prop['type'] = property.type[0]
-          }
-          property = {
-            ...property,
-            ..._prop,
-          }
-        }
-
-        if (
-          property.hasOwnProperty('anyOf') ||
-          property.hasOwnProperty('allOf') ||
-          property.hasOwnProperty('oneOf')
-        ) {
-          let _ = property.anyOf || property.allOf || property.oneOf
-          assert(_, 'anyOf/allOf/oneOf not defined')
-
-          let isNullable = false
-          let exceptNull = _.filter((key) =>
-            key && key !== true && key.type !== 'null' ? true : false,
-          )
-          if (exceptNull.length !== _.length) {
-            isNullable = true
-          }
-
-          property = {
-            [Object.keys(property).length && Object.keys(property)[0]]:
-              exceptNull,
-          }
-
-          isNullable && (_prop['nullable'] = true)
-
-          property = {
-            ...property,
-            ..._prop,
-          }
-        }
-
-        // if (Array.isArray(property.anyOf)) {
-        //   if (
-        //     property.anyOf.find(
-        //       (_) => typeof _ !== 'boolean' && _.type === 'null',
-        //     )
-        //   ) {
-        //     // TODO: refs comes here
-        //     _prop['type'] = 'object'
-        //     // TODO: this can be or can not be null, I guess. investigate more
-        //     _prop['nullable'] = true
-        //   }
-        //   property = {
-        //     ..._prop,
-        //   }
-        // }
-
-        accumulator[propertyName] = property
-        return accumulator
-      }
-    }, {})
-
-    let { [indexField.name]: id, ...rest } = sanitizedProperties
-
-    assert(typeof id !== 'undefined', 'Definition must have property `id`')
-    assert(typeof id !== 'boolean', `id of type boolean unsupported`)
-    assert(
-      id.type === 'string' || id.type === 'integer',
-      `id must be of type string or integer but got ${id.type}`,
-    )
-
-    return {
-      body:
-        method === 'create' || method === 'update'
-          ? {
-              content: {
-                'application/json': {
-                  schema: {
-                    ...modelDefinition,
-                    properties: {
-                      ...rest,
-                    },
-                  },
-                },
-              },
-            }
-          : method === 'search'
-          ? {
-              content: {
-                'application/json': {
-                  schema: {
-                    type: 'object',
-                  },
-                },
-              },
-            }
-          : undefined,
-      params:
-        method !== 'create' && method !== 'search'
-          ? [
-              {
-                name: indexField.name,
-                in: 'path',
-                required: true,
-                schema: { type: 'string' },
-              },
-            ]
-          : undefined,
-    }
-  } else {
-    return {
-      body: undefined,
-      params: undefined,
-    }
-  }
-}
-
 const _generateBodyAndParamsFromJsonSchema = (
   method: METHOD,
   modelName: string,
   jsonSchema: JSONSchema7,
   modelFields: DMMF.Field[],
+  dataSourceName: string,
 ): BodyAndParams => {
   let indexField = findIndexField(modelFields)
 
@@ -286,7 +124,7 @@ const _generateBodyAndParamsFromJsonSchema = (
             content: {
               'application/json': {
                 schema: {
-                  $ref: `#/definitions/${modelName}`,
+                  $ref: `${dataSourceName}.${modelName}`,
                 },
               },
             },
@@ -296,7 +134,7 @@ const _generateBodyAndParamsFromJsonSchema = (
             content: {
               'application/json': {
                 schema: {
-                  $ref: `#/definitions/${modelName}`,
+                  $ref: `${dataSourceName}.${modelName}`,
                 },
               },
             },
@@ -390,6 +228,7 @@ const generateEvent = (
       modelName,
       jsonSchema,
       modelFields,
+      dataSourceName,
     )
 
     bodyAndParams = { body, params }

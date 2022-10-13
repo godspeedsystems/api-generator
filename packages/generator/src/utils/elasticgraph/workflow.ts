@@ -40,10 +40,10 @@ const genData = (method: METHOD, entityName: string) => {
           size: `<% inputs.body.size || 10 %>`,
         }
       : method === 'update'
-      ? { id: `<% inputs.body.id %>`, body: `<% inputs.body %>` }
+      ? { id: `<% inputs.body.id %>`, body: `<% inputs.body.data %>` }
       : method === 'delete'
       ? { id: `<% inputs.body.id %>` }
-      : { body: `<% inputs.body %>` }),
+      : { body: `<% inputs.body.data %>` }),
   }
 }
 

@@ -103,7 +103,32 @@ const genBodyAndParams = (method: METHOD, entityFields: any): any => {
         'application/json': {
           schema: {
             type: 'object',
-            properties: { ...processEntityObject(entityFields) },
+            properties: {
+              ...((method === 'delete' ||
+                method === 'update' ||
+                method === 'one') && {
+                id: {
+                  type: 'string',
+                },
+              }),
+              ...((method === 'update' || method === 'create') && {
+                data: {
+                  type: 'object',
+                  properties: { ...processEntityObject(entityFields) },
+                },
+              }),
+              ...(method === 'search' && {
+                query: {
+                  type: 'object',
+                },
+                from: {
+                  type: 'number',
+                },
+                size: {
+                  type: 'number',
+                },
+              }),
+            },
           },
         },
       },

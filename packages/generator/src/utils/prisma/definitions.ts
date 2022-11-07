@@ -1,6 +1,7 @@
 import { DMMF } from '@prisma/generator-helper'
 import assert from 'assert'
 import { JSONSchema7 } from 'json-schema'
+import replaceValuesByRegx from '../../helpers/replaceValuesByRegx'
 import { writeFileSafely } from '../writeFileSafely'
 import { findIndexField } from './event'
 const jsYaml = require('js-yaml')
@@ -34,6 +35,7 @@ export const generateDefinitionsFile = (
 
     if (typeof modelDefinition.properties !== 'undefined') {
       let property = modelDefinition.properties[propertyName]
+      console.log(property)
       let _prop: { nullable?: boolean; type?: any } = {}
 
       assert(
@@ -96,5 +98,9 @@ export const generateDefinitionsFile = (
     properties: rest,
   }
 
-  return _defs
+  return replaceValuesByRegx(
+    _defs,
+    /^(#\/definitions\/)(.*)/i,
+    `$1${dsName}/$2`,
+  )
 }

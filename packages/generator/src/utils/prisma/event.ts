@@ -124,7 +124,7 @@ const _generateBodyAndParamsFromJsonSchema = (
             content: {
               'application/json': {
                 schema: {
-                  $ref: `${dataSourceName}.${modelName}`,
+                  $ref: `#/definitions/${dataSourceName}/${modelName}`,
                 },
               },
             },
@@ -134,7 +134,7 @@ const _generateBodyAndParamsFromJsonSchema = (
             content: {
               'application/json': {
                 schema: {
-                  $ref: `${dataSourceName}.${modelName}`,
+                  $ref: `#/definitions/${dataSourceName}/${modelName}`,
                 },
               },
             },

@@ -43,11 +43,11 @@ const generateTaskId = (
 const generateDsMethod = (modelName: string, method: METHOD): string => {
   switch (method) {
     case 'one':
-      return `${modelName.toLowerCase()}.findUnique`
+      return `${modelName}.findUnique`
     case 'create':
-      return `${modelName.toLowerCase()}.create`
+      return `${modelName}.create`
     case 'delete':
-      return `${modelName.toLowerCase()}.delete`
+      return `${modelName}.delete`
     case 'update':
       return `${modelName}.update`
     case 'search':

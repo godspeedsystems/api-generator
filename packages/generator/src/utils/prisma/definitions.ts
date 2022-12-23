@@ -2,7 +2,6 @@ import { DMMF } from '@prisma/generator-helper'
 import assert from 'assert'
 import { JSONSchema7 } from 'json-schema'
 import replaceValuesByRegx from '../../helpers/replaceValuesByRegx'
-import { writeFileSafely } from '../writeFileSafely'
 import { findIndexField } from './event'
 const jsYaml = require('js-yaml')
 
@@ -12,7 +11,6 @@ export const generateDefinitionsFile = (
   jsonSchema: JSONSchema7,
   modelFields: DMMF.Field[],
 ) => {
-  //   console.log(JSON.stringify(jsonSchema, null, 2))
   let indexField = findIndexField(modelFields)
   assert(jsonSchema, `There is no valid jsonSchema present for ${dsName}.`)
 
@@ -35,7 +33,6 @@ export const generateDefinitionsFile = (
 
     if (typeof modelDefinition.properties !== 'undefined') {
       let property = modelDefinition.properties[propertyName]
-      console.log(property)
       let _prop: { nullable?: boolean; type?: any } = {}
 
       assert(

@@ -2,7 +2,6 @@ import { DMMF } from '@prisma/generator-helper'
 import { generateWriteLocationForMethod } from '../generateWriteLocationForMethod'
 import { writeFileSafely } from '../writeFileSafely'
 import { JSONSchema7 } from 'json-schema'
-import assert from 'assert'
 import { generateDefinitionsFile } from './definitions'
 
 const jsYaml = require('js-yaml')
@@ -100,7 +99,7 @@ type Param = {
 }
 
 type Body = {
-  content: { 'application/json': { schema: JSONSchema7 } }
+  content: { 'application/json': any }
 }
 
 type BodyAndParams = {
@@ -134,7 +133,7 @@ const _generateBodyAndParamsFromJsonSchema = (
             content: {
               'application/json': {
                 schema: {
-                  $ref: `#/definitions/${dataSourceName}/${modelName}`,
+                  type: 'object'
                 },
               },
             },

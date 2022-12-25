@@ -4,4 +4,6 @@ yarn-error.log
 build
 pnpm-debug.log
 .env*
-packages/usage/**
+packages/usage/src/definitions/**
+packages/usage/src/events/**
+packages/usage/src/functions/**

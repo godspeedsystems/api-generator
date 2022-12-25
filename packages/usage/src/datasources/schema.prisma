@@ -1,0 +1,73 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated-clients/postgres"
+  previewFeatures = ["metrics"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model Owner {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String?
+}
+
+model Restaurant {
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  name      String
+  since  DateTime
+  isOpen  Boolean    @default(false)
+  opsStartTime DateTime
+  opsEndTime DateTime
+  ownerId   Int?
+  slug     String    @unique
+  description String?
+  location String
+  menuItems MenuItems[]
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String
+}
+
+model MenuItems {
+  id  Int @id @default(autoincrement())
+  name String
+  description String?
+  restaurant Restaurant @relation(fields: [restaurantId], references: id)
+  restaurantId  Int
+}
+
+model Order {
+  id Int @id @default(autoincrement())
+  frmoRestaurant Int
+  orderStatus OrderStatus @default(NOT_INITIATED)
+  placedAt DateTime?
+  fulfilledAt DateTime?
+  orderItems OrderItem[]
+}
+
+model OrderItem {
+  id Int @id @default(autoincrement())
+  menuItemId Int
+  quantity Int
+  order Order @relation(fields: [orderId], references: id)
+  orderId Int
+}
+
+enum OrderStatus {
+  INITIATED
+  NOT_INITIATED
+  WAITING_FOR_APPROVAL_FROM_RESTAURANT
+  WAITING_FOR_DELIVERY_PARTNER
+  PLACED
+  PICKUP_BY_DELIVERY_PARTNER
+  DELIVERED
+  READY_TO_PICKUP
+}

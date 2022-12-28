@@ -1,3 +1,14 @@
+## [1.6.3](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.6.2...v1.6.3) (2022-12-28)
+
+
+### Bug Fixes
+
+* installed glob types ([1bc04f9](https://github.com/ashu17706/godspeed-crud-api-generator/commit/1bc04f95ce8ee82ab538d99b0f24f47c1a971098))
+* lowercase model name ([d45b593](https://github.com/ashu17706/godspeed-crud-api-generator/commit/d45b593ebc63342a0f43f624c6e1e36640b4526b))
+* search api should not have model object as request body ([fe88fe3](https://github.com/ashu17706/godspeed-crud-api-generator/commit/fe88fe330de4d59fd890f30bec78d94f73c8f947))
+* updated .gitignore file ([e65130e](https://github.com/ashu17706/godspeed-crud-api-generator/commit/e65130e4374fd8863e8b5e6f2b7df031e85a4ccb))
+* updated package lock ([2be97ce](https://github.com/ashu17706/godspeed-crud-api-generator/commit/2be97ceb0453cd3757d1cca8db9e1c63d4ace2a3))
+
 ## [1.6.2](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.6.1...v1.6.2) (2022-11-07)
 
 

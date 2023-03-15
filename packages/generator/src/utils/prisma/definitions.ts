@@ -3,7 +3,6 @@ import assert from 'assert'
 import { JSONSchema7 } from 'json-schema'
 import replaceValuesByRegx from '../../helpers/replaceValuesByRegx'
 import { findIndexField } from './event'
-const jsYaml = require('js-yaml')
 
 export const generateDefinitionsFile = (
   dsName: string,
@@ -40,6 +39,34 @@ export const generateDefinitionsFile = (
         'Property of type boolean unsupported',
       )
 
+      // three cases, where we need to remove another refs
+      if (property.type === 'array') {
+        if (property.items && property.items.hasOwnProperty('$ref')) {
+          return accumulator
+        }
+      }
+
+      if (property.hasOwnProperty('$ref')) {
+        return accumulator
+      }
+
+      if (
+        property.hasOwnProperty('anyOf') ||
+        property.hasOwnProperty('allOf') ||
+        property.hasOwnProperty('oneOf')
+      ) {
+        let _ = property.anyOf || property.allOf || property.oneOf
+        assert(_, 'anyOf/allOf/oneOf not defined')
+
+        let refCount = _.filter((obj) => {
+          return obj.hasOwnProperty('$ref') ? true : false
+        }).length
+
+        if (refCount) {
+          return accumulator
+        }
+      }
+
       if (Array.isArray(property.type)) {
         if (property.type.find((_) => _ === 'null')) {
           // TODO: investigate in future
@@ -52,34 +79,35 @@ export const generateDefinitionsFile = (
         }
       }
 
-      if (
-        property.hasOwnProperty('anyOf') ||
-        property.hasOwnProperty('allOf') ||
-        property.hasOwnProperty('oneOf')
-      ) {
-        let _ = property.anyOf || property.allOf || property.oneOf
-        assert(_, 'anyOf/allOf/oneOf not defined')
+      // if (
+      //   property.hasOwnProperty('anyOf') ||
+      //   property.hasOwnProperty('allOf') ||
+      //   property.hasOwnProperty('oneOf')
+      // ) {
+      //   let _ = property.anyOf || property.allOf || property.oneOf
+      //   assert(_, 'anyOf/allOf/oneOf not defined')
 
-        let isNullable = false
-        let exceptNull = _.filter((key) =>
-          key && key !== true && key.type !== 'null' ? true : false,
-        )
-        if (exceptNull.length !== _.length) {
-          isNullable = true
-        }
+      //   let isNullable = false
+      //   let exceptNull = _.filter((key) =>
+      //     key && key !== true && key.type !== 'null' ? true : false,
+      //   )
+      //   // NOTE: Removing this because this is not a correct logic
+      //   // if (exceptNull.length !== _.length) {
+      //   //   isNullable = true
+      //   // }
 
-        property = {
-          [Object.keys(property).length && Object.keys(property)[0]]:
-            exceptNull,
-        }
+      //   property = {
+      //     [Object.keys(property).length && Object.keys(property)[0]]:
+      //       exceptNull,
+      //   }
 
-        isNullable && (_prop['nullable'] = true)
+      //   isNullable && (_prop['nullable'] = true)
 
-        property = {
-          ...property,
-          ..._prop,
-        }
-      }
+      //   property = {
+      //     ...property,
+      //     ..._prop,
+      //   }
+      // }
 
       accumulator[propertyName] = property
       return accumulator

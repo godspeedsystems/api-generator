@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.6.3...v1.6.4) (2023-03-15)
+
+
+### Bug Fixes
+
+* refs ([e453afd](https://github.com/ashu17706/godspeed-crud-api-generator/commit/e453afdf10da51a1ea30ce1aef974788a7b84c6e))
+
 ## [1.6.3](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.6.2...v1.6.3) (2022-12-28)
 
 

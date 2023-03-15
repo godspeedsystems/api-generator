@@ -1,7 +1,6 @@
-
 generator client {
-  provider = "prisma-client-js"
-  output   = "./generated-clients/postgres"
+  provider        = "prisma-client-js"
+  output          = "./generated-clients/postgres"
   previewFeatures = ["metrics"]
 }
 
@@ -10,64 +9,42 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
-model Owner {
+model User {
   id      Int      @id @default(autoincrement())
   email   String   @unique
   name    String?
+  role    Role     @default(USER)
+  posts   Post[]
+  profile Profile?
 }
 
-model Restaurant {
-  id         Int        @id @default(autoincrement())
-  createdAt  DateTime   @default(now())
-  name      String
-  since  DateTime
-  isOpen  Boolean    @default(false)
-  opsStartTime DateTime
-  opsEndTime DateTime
-  ownerId   Int?
-  slug     String    @unique
+model Profile {
+  id     Int    @id @default(autoincrement())
+  bio    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
+}
+
+model Post {
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  title       String
+  published   Boolean    @default(false)
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    Int
+  categories  Category[]
+  slug        String     @unique
+  body        String
   description String?
-  location String
-  menuItems MenuItems[]
 }
 
 model Category {
   id    Int    @id @default(autoincrement())
   name  String
+  posts Post[]
 }
 
-model MenuItems {
-  id  Int @id @default(autoincrement())
-  name String
-  description String?
-  restaurant Restaurant @relation(fields: [restaurantId], references: id)
-  restaurantId  Int
-}
-
-model Order {
-  id Int @id @default(autoincrement())
-  frmoRestaurant Int
-  orderStatus OrderStatus @default(NOT_INITIATED)
-  placedAt DateTime?
-  fulfilledAt DateTime?
-  orderItems OrderItem[]
-}
-
-model OrderItem {
-  id Int @id @default(autoincrement())
-  menuItemId Int
-  quantity Int
-  order Order @relation(fields: [orderId], references: id)
-  orderId Int
-}
-
-enum OrderStatus {
-  INITIATED
-  NOT_INITIATED
-  WAITING_FOR_APPROVAL_FROM_RESTAURANT
-  WAITING_FOR_DELIVERY_PARTNER
-  PLACED
-  PICKUP_BY_DELIVERY_PARTNER
-  DELIVERED
-  READY_TO_PICKUP
+enum Role {
+  USER
+  ADMIN
 }

@@ -1,3 +1,10 @@
+## [1.6.5](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.6.4...v1.6.5) (2023-04-12)
+
+
+### Bug Fixes
+
+* fixed @prisma/client version ([a5d23ce](https://github.com/ashu17706/godspeed-crud-api-generator/commit/a5d23ce2a8a36ce16a6737571616622c952bf002))
+
 ## [1.6.4](https://github.com/ashu17706/godspeed-crud-api-generator/compare/v1.6.3...v1.6.4) (2023-03-15)
 
 

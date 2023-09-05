@@ -17,15 +17,15 @@ const genEventKey = (
 ): string => {
   switch (method) {
     case 'one':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/:id.http.get`
+      return `http.get./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/:id`
     case 'create':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}.http.post`
+      return `http.post./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
     case 'update':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}.http.put`
+      return `http.put./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
     case 'delete':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}.http.delete`
+      return `http.delete./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
     case 'search':
-      return `/${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/search.http.post`
+      return `http.post./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/search`
     default:
       return ''
   }

@@ -62,35 +62,30 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
   switch (method) {
     case 'one':
       return {
-        data: {
           where: {
             [`${indexField?.name}`]: `<% ${
               indexField?.type === 'Int'
                 ? `parseInt(inputs.params.${indexField?.name})`
                 : `inputs.params.${indexField?.name}`
             } %>`,
-          },
         },
       }
     case 'create':
       return {
-        data: { data: `<% inputs.body %>` },
+        data: `<% inputs.body %>` ,
       }
     case 'delete':
       return {
-        data: {
           where: {
             [`${indexField?.name}`]: `<% ${
               indexField?.type === 'Int'
                 ? `parseInt(inputs.params.${indexField?.name})`
                 : `inputs.params.${indexField?.name}`
             } %>`,
-          },
         },
       }
     case 'update':
       return {
-        data: {
           where: {
             [`${indexField?.name}`]: `<% ${
               indexField?.type === 'Int'
@@ -99,7 +94,6 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
             } %>`,
           },
           data: `<% inputs.body %>`,
-        },
       }
     case 'search':
       return {
@@ -131,13 +125,14 @@ export const generateAndStoreWorkflow = async (
     tasks: [
       {
         id: taskId,
-        fn: 'com.gs.datastore',
+        // fn: 'com.gs.datastore',
+        fn: `datasource.${dataSourceName}.${generateDsMethod(modelName, method)}`,
         args: {
-          datasource: dataSourceName,
+          // datasource: dataSourceName,
           ...data,
-          config: {
-            method: generateDsMethod(modelName, method),
-          },
+          // config: {
+          //   method: generateDsMethod(modelName, method),
+          // },
         },
       },
     ],

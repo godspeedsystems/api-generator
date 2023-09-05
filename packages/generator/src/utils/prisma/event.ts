@@ -30,21 +30,21 @@ const generateEventKey = (
 
   switch (method) {
     case 'one':
-      return `http.get/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
+      return `http.get./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
         indexField?.name
-      }`
+      }}`
     case 'create':
-      return `http.post/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}`
+      return `http.post./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}`
     case 'update':
-      return `http.put/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
+      return `http.put./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
         indexField?.name
-      }`
+      }}`
     case 'delete':
-      return `http.delete/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/:${
+      return `http.delete./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
         indexField?.name
-      }`
+      }}`
     case 'search':
-      return `http.post/${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/search`
+      return `http.post./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/search`
     default:
       return ''
   }

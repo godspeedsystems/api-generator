@@ -4,7 +4,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "dist/bin.js",
   "license": "MIT",
   "bin": {
@@ -16,7 +16,8 @@
   "scripts": {
     "start": "node dist/bin.js",
     "dev": "npx tsc -w",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@openapi-contrib/json-schema-to-openapi-schema": "^2.1.1",

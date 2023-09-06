@@ -1,26 +1,24 @@
 {
   "name": "@godspeedsystems/api-generator",
+  "version": "2.0.2",
   "description": "godspeed CRUD api generator will generate events and workflows based on datasource schema model",
   "publishConfig": {
     "access": "public"
   },
-  "version": "2.0.1",
   "main": "dist/bin.js",
-  "license": "MIT",
-  "bin": {
-    "godspeed-crud-api-generator": "dist/bin.js"
-  },
+  "license": "SEE LICENSE IN LICENSE.md",
   "engines": {
     "node": ">=14.0"
   },
   "scripts": {
     "start": "node dist/bin.js",
     "dev": "npx tsc -w",
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@openapi-contrib/json-schema-to-openapi-schema": "^2.1.1",
-    "@prisma/client": "4.10.1",
+    "@prisma/client": "^5.2.0",
     "@prisma/generator-helper": "4.10.1",
     "@prisma/internals": "4.10.1",
     "chalk": "^4.1.2",

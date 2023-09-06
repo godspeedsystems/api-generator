@@ -1,15 +1,12 @@
 {
   "name": "@godspeedsystems/api-generator",
+  "version": "2.0.2",
   "description": "godspeed CRUD api generator will generate events and workflows based on datasource schema model",
   "publishConfig": {
     "access": "public"
   },
-  "version": "2.0.2",
   "main": "dist/bin.js",
-  "license": "MIT",
-  "bin": {
-    "godspeed-crud-api-generator": "dist/bin.js"
-  },
+  "license": "SEE LICENSE IN LICENSE.md",
   "engines": {
     "node": ">=14.0"
   },

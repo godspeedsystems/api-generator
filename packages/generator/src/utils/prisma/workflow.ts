@@ -97,7 +97,7 @@ const generateData = (modelFields: DMMF.Field[], method: METHOD): any => {
       }
     case 'search':
       return {
-        data: `<% inputs.body %>`,
+        // data: `<% inputs.body %>`,
       }
     default:
       return ''

@@ -1,6 +1,6 @@
 {
   "name": "@godspeedsystems/api-generator",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "description": "godspeed CRUD api generator will generate events and workflows based on datasource schema model",
   "publishConfig": {
     "access": "public"
@@ -15,6 +15,9 @@
     "dev": "npx tsc -w",
     "build": "npx tsc",
     "prepublishOnly": "npm run build"
+  },
+  "bin": {
+    "godspeed-crud-gen": "./dist/bin.js"
   },
   "dependencies": {
     "@openapi-contrib/json-schema-to-openapi-schema": "^2.1.1",

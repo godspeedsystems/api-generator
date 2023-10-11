@@ -160,7 +160,7 @@ const invokeGenerationForElasticgraphDS = async ({
 
 const generateCrudAPIs = async () => {
   try {
-    let datasourceDir = path.join(process.cwd() + '/src/datasources/')
+    let datasourceDir = path.join(process.cwd(), 'src', 'datasources')
 
     // find eligible datasource, as of now elasticgraph and prisma are eligible
     // for auto generation, and here onwards let's consider .prisma also as a datasource

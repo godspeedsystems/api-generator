@@ -9,6 +9,7 @@ export const generateDefinitionsFile = (
   modelName: string,
   jsonSchema: JSONSchema7,
   modelFields: DMMF.Field[],
+
 ) => {
   let indexField = findIndexField(modelFields)
   assert(jsonSchema, `There is no valid jsonSchema present for ${dsName}.`)
@@ -68,10 +69,15 @@ export const generateDefinitionsFile = (
       }
 
       if (Array.isArray(property.type)) {
-        if (property.type.find((_) => _ === 'null')) {
+        if (property.type.length === 2) {
           // TODO: investigate in future
           _prop['nullable'] = true
           _prop['type'] = property.type[0]
+        }
+        if (property.type.length === 6) {
+          // TODO: investigate in future
+          _prop['nullable'] = true
+          _prop['type'] = 'object'
         }
         property = {
           ...property,

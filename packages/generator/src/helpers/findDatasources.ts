@@ -1,7 +1,7 @@
 import { glob } from 'glob'
 import * as yaml from 'js-yaml'
 import fs from 'fs'
-
+import path from 'path'
 export type dsDefinition = {
   dsType?: 'prisma' | 'elasticgraph'
   dsName?: string
@@ -21,8 +21,14 @@ const findDatasources = (datasourceDir: string): Promise<dsDefinition[]> => {
   // for yaml datasource, look for types, and filter with type elasticgraph
   return new Promise((resolve, reject) => {
     glob(
-      datasourceDir + '/**/*.?(prisma|yaml|yml)',
-      { ignore: '/**/generated-clients/**/*.?(prisma)' },
+      path
+        .join(datasourceDir, '**', '*.?(prisma|yaml|yml)')
+        .replace(/\\/g, '/'),
+      {
+        ignore: path
+          .join('**', 'generated-clients/**/*.?(prisma)')
+          .replace(/\\/g, '/'),
+      },
       (err: Error | null, datasourcePaths: string[]) => {
         if (err) {
           return reject(err)

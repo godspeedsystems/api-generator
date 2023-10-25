@@ -23,7 +23,7 @@
     "@openapi-contrib/json-schema-to-openapi-schema": "^2.1.1",
     "@prisma/client": "^5.2.0",
     "@prisma/generator-helper": "4.10.1",
-    "@prisma/internals": "4.10.1",
+    "@prisma/internals": "5.5.2",
     "chalk": "^4.1.2",
     "cli-select": "^1.1.2",
     "glob": "^8.0.3",

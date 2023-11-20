@@ -83,14 +83,10 @@ export const generateAndStoreWorkflow = async (
     tasks: [
       {
         id: taskId,
-        // fn: 'com.gs.elasticgraph',
         fn: `datasource.${dataSourceName}.${genEgMethod(method, entityName)}`,
-        args:
-          // datasource: dataSourceName,
-          genData(method, entityName),
-        // config: {
-        //   method: genEgMethod(method, entityName),
-        // },
+        args: {
+          data: genData(method, entityName),
+        },
         on_error: { continue: false },
       },
     ],

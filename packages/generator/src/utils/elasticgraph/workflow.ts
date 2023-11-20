@@ -43,20 +43,24 @@ const genData = (method: METHOD, entityName: string) => {
       ? { id: `<% inputs.body.id %>`, body: `<% inputs.body.data %>` }
       : method === 'delete'
       ? { id: `<% inputs.body.id %>` }
+      : method === 'one'
+      ? { id: `<% inputs.params.id %>` }
       : { body: `<% inputs.body.data %>` }),
   }
 }
 
 const genEgMethod = (method: METHOD, entityName: string) => {
   switch (method) {
+    case 'one':
+      return `${entityName}.get`
     case 'create':
-      return 'index'
+      return `${entityName}.index`
     case 'delete':
-      return 'delete'
+      return `${entityName}.delete`
     case 'update':
-      return 'index'
+      return `${entityName}.update`
     case 'search':
-      return 'search'
+      return `${entityName}.search`
     default:
       return ''
   }
@@ -79,14 +83,14 @@ export const generateAndStoreWorkflow = async (
     tasks: [
       {
         id: taskId,
-        fn: 'com.gs.elasticgraph',
-        args: {
-          datasource: dataSourceName,
-          data: genData(method, entityName),
-          config: {
-            method: genEgMethod(method, entityName),
-          },
-        },
+        // fn: 'com.gs.elasticgraph',
+        fn: `datasource.${dataSourceName}.${genEgMethod(method, entityName)}`,
+        args:
+          // datasource: dataSourceName,
+          genData(method, entityName),
+        // config: {
+        //   method: genEgMethod(method, entityName),
+        // },
         on_error: { continue: false },
       },
     ],

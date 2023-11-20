@@ -39,7 +39,7 @@ const genData = (method: METHOD, entityName: string) => {
           from: `<% inputs.body.from || 0 %>`,
           size: `<% inputs.body.size || 10 %>`,
         }
-      : method === 'update'
+      : method === 'update' || method === 'create'
       ? { id: `<% inputs.body.id %>`, body: `<% inputs.body.data %>` }
       : method === 'delete'
       ? { id: `<% inputs.body.id %>` }
@@ -83,14 +83,10 @@ export const generateAndStoreWorkflow = async (
     tasks: [
       {
         id: taskId,
-        // fn: 'com.gs.elasticgraph',
         fn: `datasource.${dataSourceName}.${genEgMethod(method, entityName)}`,
-        args:
-          // datasource: dataSourceName,
-          genData(method, entityName),
-        // config: {
-        //   method: genEgMethod(method, entityName),
-        // },
+        args: {
+          data: genData(method, entityName),
+        },
         on_error: { continue: false },
       },
     ],

@@ -39,7 +39,7 @@ const genData = (method: METHOD, entityName: string) => {
           from: `<% inputs.body.from || 0 %>`,
           size: `<% inputs.body.size || 10 %>`,
         }
-      : method === 'update'
+      : method === 'update' || method === 'create'
       ? { id: `<% inputs.body.id %>`, body: `<% inputs.body.data %>` }
       : method === 'delete'
       ? { id: `<% inputs.body.id %>` }

@@ -195,7 +195,7 @@ export const generateAndStoreEvent = async (
   let json: any = {}
   let { basePathForGeneration, dataSourceName, entityName, entityFields } =
     eventConfig
-  const METHODS: METHOD[] = ['create', 'update', 'delete', 'search']
+  const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
 
   let consolidateJsonForEvent = METHODS.map((method) => {
     let content = `# ${method.toUpperCase()}\r\n`

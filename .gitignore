@@ -7,3 +7,4 @@ pnpm-debug.log
 packages/usage/src/definitions/**
 packages/usage/src/events/**
 packages/usage/src/functions/**
+packages/usage/src/eventsources/**

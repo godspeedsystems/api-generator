@@ -14,18 +14,20 @@ const genEventKey = (
   dataSourceName: string,
   entityName: string,
   method: METHOD,
+  eventsource:string,
 ): string => {
+
   switch (method) {
     case 'one':
-      return `http.get./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/:id`
+      return `${eventsource}.get./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/:id`
     case 'create':
-      return `http.post./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
+      return `${eventsource}.post./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
     case 'update':
-      return `http.put./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
+      return `${eventsource}.put./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
     case 'delete':
-      return `http.delete./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
+      return `${eventsource}.delete./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}`
     case 'search':
-      return `http.post./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/search`
+      return `${eventsource}.post./${dataSourceName.toLowerCase()}/${entityName.toLowerCase()}/search`
     default:
       return ''
   }
@@ -163,13 +165,12 @@ const genResponses = (method: METHOD): any => {
 const generateEvent = (
   eventConfig: EventConfig & {
     method: METHOD
-  },
+  },eventsource:string
 ): any => {
   let json: any = {}
 
   let { dataSourceName, entityName, entityFields, method } = eventConfig
-
-  let eventKey = genEventKey(dataSourceName, entityName, method)
+  let eventKey = genEventKey(dataSourceName, entityName, method,eventsource)
   let summary = genEventSummary(entityName, method)
   let description = genEventDescription(entityName, method)
   let fn = genEventFunction(method, entityName, dataSourceName)
@@ -191,6 +192,7 @@ const generateEvent = (
 
 export const generateAndStoreEvent = async (
   eventConfig: EventConfig,
+  eventsource: string,
 ): Promise<string> => {
   let json: any = {}
   let { basePathForGeneration, dataSourceName, entityName, entityFields } =
@@ -199,7 +201,7 @@ export const generateAndStoreEvent = async (
 
   let consolidateJsonForEvent = METHODS.map((method) => {
     let content = `# ${method.toUpperCase()}\r\n`
-    let { eventKey, structure } = generateEvent({ ...eventConfig, method })
+    let { eventKey, structure } = generateEvent({ ...eventConfig, method },eventsource)
     content = content + `${jsYaml.dump({ [eventKey]: structure })}\r\n`
     return content
   }).join('')

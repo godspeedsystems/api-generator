@@ -24,27 +24,26 @@ export const findIndexField = (
 
 const generateEventKey = (
   { dataSourceName, modelName, modelFields }: EventConfig,
-  method: METHOD,
+  method: METHOD,eventsource:string
 ): string => {
   let indexField = findIndexField(modelFields)
-
   switch (method) {
     case 'one':
-      return `http.get./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
+      return `${eventsource}.get./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
         indexField?.name
       }}`
     case 'create':
-      return `http.post./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}`
+      return `${eventsource}.post./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}`
     case 'update':
-      return `http.put./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
+      return `${eventsource}.put./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
         indexField?.name
       }}`
     case 'delete':
-      return `http.delete./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
+      return `${eventsource}.delete./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/{${
         indexField?.name
       }}`
     case 'search':
-      return `http.post./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/search`
+      return `${eventsource}.post./${dataSourceName.toLowerCase()}/${modelName.toLowerCase()}/search`
     default:
       return ''
   }
@@ -198,12 +197,13 @@ const generateResponses = (method: METHOD): Responses => {
 const generateEvent = (
   eventConfig: EventConfig & {
     jsonSchema: JSONSchema7
-    method: METHOD
+    method: METHOD,
+    eventsource:string
   },
 ): any => {
   let json: any = {}
 
-  let { dataSourceName, modelName, method, modelFields, jsonSchema } =
+  let { dataSourceName, modelName, method, modelFields, jsonSchema,eventsource } =
     eventConfig
 
   let eventKey = generateEventKey(
@@ -213,6 +213,7 @@ const generateEvent = (
       modelFields: modelFields,
     },
     method,
+    eventsource,
   )
 
   let summary = generateSummaryBasedOnModelAndMethod(modelName, method)
@@ -252,7 +253,8 @@ const generateEvent = (
 export const generateAndStoreEvent = async (
   eventConfig: EventConfig & {
     basePathForGeneration: string
-    jsonSchema: JSONSchema7
+    jsonSchema: JSONSchema7,
+    eventsource: string,
   },
   setDefs: any,
 ): Promise<string> => {
@@ -262,6 +264,7 @@ export const generateAndStoreEvent = async (
     modelName,
     modelFields,
     jsonSchema,
+    eventsource,
   } = eventConfig
 
   const METHODS: METHOD[] = ['one', 'create', 'update', 'delete', 'search']
@@ -278,7 +281,7 @@ export const generateAndStoreEvent = async (
 
   let consolidateJsonForEvent = METHODS.map((method) => {
     let content = `# ${method.toUpperCase()}\r\n`
-    let { eventKey, structure } = generateEvent({ ...eventConfig, method })
+    let { eventKey, structure } = generateEvent({ ...eventConfig, method,eventsource })
     content = content + `${jsYaml.dump({ [eventKey]: structure })}\r\n`
     return content
   }).join('')
